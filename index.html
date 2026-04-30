@@ -10,21 +10,22 @@
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1QPSZMLX4"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
+    window.dataLayer=window.dataLayer||[];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-P1QPSZMLX4');
+    gtag('js',new Date());
+    gtag('config','G-P1QPSZMLX4');
   </script>
   <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#080b10}</style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useMemo } = React;
+const {useState,useMemo}=React;
 
-const SOUND=340, G_ACC=9.81, RHO=1.225;
+const SOUND=340,G_ACC=9.81,RHO=1.225;
 const DISP=[25,50,100,150,200,300];
 const ZEROS=[25,50,100,150,200];
+const PISTOL_CALS=["22lr","9x19"];
 
 const G1=[
   [0,.2629],[.05,.2558],[.1,.2487],[.15,.2413],[.2,.2335],[.25,.2259],
@@ -66,14 +67,17 @@ function simulate(bc_g1,mv,dists){
   return {drops,tofs};
 }
 
-function sdrop(bd,zero,d){
+// Kulfall relativt siktlinje med sikthöjd
+// Siktlinje: från (0, +sh) till (zero, boreDrop[zero])
+function sdrop(drops,zero,d,sh){
   if(d===zero) return 0;
-  return Math.round((bd[d]-(bd[zero]/zero)*d)*10)/10;
+  const result=drops[d]-sh*(1-d/zero)-drops[zero]*(d/zero);
+  return Math.round(result*10)/10;
 }
 
-function windDrift(tof,dist,mv,windMs,windFactor){
+function windDrift(tof,dist,mv,windMs,wf){
   if(windMs===0) return 0;
-  return Math.round(windMs*windFactor*(tof-dist/mv)*100*10)/10;
+  return Math.round(windMs*wf*(tof-dist/mv)*100*10)/10;
 }
 
 const CALS={
@@ -129,12 +133,10 @@ const TABS=[
   {id:"223rem",label:".223 Rem"},{id:"308win",label:".308 Win"},{id:"65cm",label:"6,5 Creed"},
 ];
 
-const PISTOL_CALS=["22lr","9x19"];
-
 const WIND_DIRS=[
-  {id:"no",   label:"0°",  factor:0,   desc:"Medvind/motvind"},
-  {id:"half", label:"45°", factor:0.5, desc:"Half value"},
-  {id:"full", label:"90°", factor:1.0, desc:"Full value"},
+  {id:"no",label:"0°",factor:0,desc:"Medvind/motvind"},
+  {id:"half",label:"45°",factor:0.5,desc:"Half value"},
+  {id:"full",label:"90°",factor:1.0,desc:"Full value"},
 ];
 
 function dcol(v){
@@ -164,10 +166,12 @@ function App(){
   const [zero,setZero]=useState(25);
   const [windMs,setWindMs]=useState(0);
   const [windDir,setWindDir]=useState("full");
+  const [sh,setSh]=useState(2.5);
 
   const cal=CALS[tab];
   const bul=cal.bullets[bi];
   const wf=WIND_DIRS.find(d=>d.id===windDir).factor;
+  const showWind=windMs>0;
 
   const pc=useMemo(()=>{
     const r={};
@@ -177,9 +181,11 @@ function App(){
     return r;
   },[]);
 
-  function switchTab(id){setTab(id);setBi(0);setZero(PISTOL_CALS.includes(id)?25:100);}
-
-  const showWind=windMs>0;
+  function switchTab(id){
+    setTab(id);setBi(0);
+    setZero(PISTOL_CALS.includes(id)?25:100);
+    setSh(PISTOL_CALS.includes(id)?2.5:3.8);
+  }
 
   return(
     <div style={{minHeight:"100vh",background:"#080b10",color:"#e2e8f0",
@@ -200,11 +206,11 @@ function App(){
           cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;transition:all .15s;border-radius:3px}
         .pill:hover{color:#94a3b8;border-color:#334155}
         .pill.on{color:var(--cc);border-color:var(--cc);background:var(--cg)}
-        .zbtn{background:transparent;border:1px solid #1e293b;color:#64748b;padding:8px 18px;
+        .zbtn{background:transparent;border:1px solid #1e293b;color:#64748b;padding:8px 16px;
           cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;transition:all .15s;border-radius:3px}
         .zbtn:hover{color:#94a3b8;border-color:#334155}
         .zbtn.on{color:var(--cc);border-color:var(--cc);background:var(--cg);box-shadow:0 0 10px var(--cg)}
-        .wbtn{background:transparent;border:1px solid #1e293b;color:#64748b;padding:7px 14px;
+        .wbtn{background:transparent;border:1px solid #1e293b;color:#64748b;padding:7px 12px;
           cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;border-radius:3px}
         .wbtn:hover{color:#94a3b8;border-color:#334155}
         .wbtn.on{color:#38bdf8;border-color:#38bdf8;background:rgba(56,189,248,.12);box-shadow:0 0 10px rgba(56,189,248,.2)}
@@ -212,20 +218,24 @@ function App(){
         .dt{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:12px}
         .dt th{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.08em;color:#475569;
           text-transform:uppercase;padding:8px 10px;text-align:center;border-bottom:1px solid #1e293b}
-        .dt th.wind-th{color:#38bdf8;opacity:.85}
+        .dt th.wth{color:#38bdf8;opacity:.85}
         .dt td{padding:8px 10px;text-align:center;border-bottom:1px solid #0f172a}
         .dt tr:hover td{background:rgba(255,255,255,.02)}
-        .wind-td{background:rgba(56,189,248,.03)}
+        .wtd{background:rgba(56,189,248,.03)}
         input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;
-          background:linear-gradient(90deg,#38bdf8 var(--pct,0%),#1e293b var(--pct,0%));outline:none}
+          background:linear-gradient(90deg,var(--rc,#38bdf8) var(--pct,0%),#1e293b var(--pct,0%));outline:none}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
-          border-radius:50%;background:#38bdf8;cursor:pointer;box-shadow:0 0 8px rgba(56,189,248,.5)}
+          border-radius:50%;background:var(--rc,#38bdf8);cursor:pointer;box-shadow:0 0 8px rgba(56,189,248,.5)}
+        .sh-btn{background:transparent;border:1px solid #334155;color:#64748b;width:28px;height:28px;
+          cursor:pointer;font-size:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;
+          transition:all .15s;font-family:monospace;line-height:1;vertical-align:middle}
+        .sh-btn:hover{color:#e2e8f0;border-color:#94a3b8}
       `}</style>
 
       <div className="grid-bg"/>
       <div className="scan" style={{"--cc":cal.color}}/>
 
-      <div style={{position:"relative",zIndex:1,maxWidth:1080,margin:"0 auto",padding:"28px 20px 40px"}}>
+      <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"28px 20px 40px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:28}}>
           <div>
@@ -251,12 +261,14 @@ function App(){
           ))}
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:22}}>
+        {/* KONTROLLPANEL — 3 kolumner */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:22}}>
+
           <div style={{padding:"14px 18px",background:"rgba(15,23,42,.6)",
             border:`1px solid ${cal.color}33`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",
               color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.7}}>Nollning</div>
-            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               {ZEROS.map(z=>(
                 <button key={z} className={`zbtn${zero===z?" on":""}`}
                   style={{"--cc":cal.color,"--cg":cal.glow}}
@@ -264,16 +276,37 @@ function App(){
               ))}
             </div>
           </div>
+
+          <div style={{padding:"14px 18px",background:"rgba(15,23,42,.6)",
+            border:`1px solid ${cal.color}33`,borderRadius:6}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",
+              color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.7}}>Sikthöjd över piplinje</div>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <button className="sh-btn" onClick={()=>setSh(s=>Math.max(1,Math.round((s-0.5)*10)/10))}>−</button>
+              <div style={{flex:1,textAlign:"center"}}>
+                <span style={{fontFamily:"'Orbitron',monospace",fontSize:22,fontWeight:700,color:cal.color}}>{sh.toFixed(1)}</span>
+                <span style={{color:"#475569",fontSize:12,marginLeft:4}}>cm</span>
+              </div>
+              <button className="sh-btn" onClick={()=>setSh(s=>Math.min(15,Math.round((s+0.5)*10)/10))}>+</button>
+            </div>
+            <div style={{marginTop:8}}>
+              <input type="range" min="1" max="15" step="0.5" value={sh}
+                style={{"--pct":`${(sh-1)/14*100}%`,"--rc":cal.color}}
+                onChange={e=>setSh(parseFloat(e.target.value))}/>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#334155",marginTop:4}}>
+              <span>Pistol ~2.5</span><span>Kikkare ~3.8</span><span>AR-järn ~6.3</span>
+            </div>
+          </div>
+
           <div style={{padding:"14px 18px",background:"rgba(15,23,42,.6)",
             border:"1px solid rgba(56,189,248,.2)",borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",
-              color:"#38bdf8",textTransform:"uppercase",marginBottom:10,opacity:.7}}>
-              Vind — {windMs} m/s
-            </div>
+              color:"#38bdf8",textTransform:"uppercase",marginBottom:10,opacity:.7}}>Vind — {windMs} m/s</div>
             <input type="range" min="0" max="10" step="0.5" value={windMs}
-              style={{"--pct":`${windMs*10}%`}}
+              style={{"--pct":`${windMs*10}%`,"--rc":"#38bdf8"}}
               onChange={e=>setWindMs(parseFloat(e.target.value))}/>
-            <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>
               {WIND_DIRS.map(d=>(
                 <button key={d.id} className={`wbtn${windDir===d.id?" on":""}`}
                   onClick={()=>setWindDir(d.id)}>
@@ -292,15 +325,24 @@ function App(){
           ))}
         </div>
 
-        <div style={{display:"flex",gap:20,marginBottom:16,padding:"9px 16px",
+        <div style={{display:"flex",gap:16,marginBottom:16,padding:"9px 16px",
           background:`linear-gradient(90deg,${cal.glow} 0%,transparent 65%)`,
           borderLeft:`3px solid ${cal.color}`,borderRadius:"0 4px 4px 0",flexWrap:"wrap",alignItems:"center"}}>
           <span style={{color:cal.color,fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:13}}>{bul.weight}</span>
           <span style={{color:"#64748b",fontSize:12}}>{bul.type}</span>
           <span style={{color:"#475569",fontSize:11}}>BC {bul.bc} G1</span>
           <span style={{color:"#475569",fontSize:11}}>Nollning: <span style={{color:cal.color,fontWeight:"bold"}}>{zero} m</span></span>
+          <span style={{color:"#475569",fontSize:11}}>Sikthöjd: <span style={{color:cal.color,fontWeight:"bold"}}>{sh.toFixed(1)} cm</span></span>
           {showWind&&<span style={{color:"#38bdf8",fontSize:11}}>Vind: <strong>{windMs} m/s</strong> · {WIND_DIRS.find(d=>d.id===windDir).label}</span>}
         </div>
+
+        {!PISTOL_CALS.includes(tab)&&zero<=50&&(
+          <div style={{marginBottom:14,padding:"8px 14px",
+            background:"rgba(251,191,36,.06)",border:"1px solid rgba(251,191,36,.2)",
+            borderRadius:4,fontSize:11,color:"#d97706",lineHeight:1.7}}>
+            ◈ <strong>Obs:</strong> Vid {zero}m-nollning på snabba kaliber stiger kulan över siktlinjen efter nollningspunkten och kan korsa siktlinjen igen vid längre avstånd. Positiva värden = kulan är ovanför siktlinjen.
+          </div>
+        )}
 
         <div className="card" style={{marginBottom:20,overflowX:"auto"}}>
           <table className="dt">
@@ -319,12 +361,11 @@ function App(){
               </tr>
               {showWind&&(
                 <tr>
-                  <th style={{color:"#334155",fontSize:9}}></th>
-                  <th style={{color:"#334155",fontSize:9}}></th>
+                  <th style={{fontSize:8}}></th><th style={{fontSize:8}}></th>
                   {DISP.map(d=>(
                     <React.Fragment key={d}>
-                      <th style={{color:"#475569",fontSize:9,letterSpacing:".05em"}}>DROP</th>
-                      <th className="wind-th" style={{fontSize:9,letterSpacing:".05em"}}>VIND</th>
+                      <th style={{fontSize:9,color:"#475569",letterSpacing:".04em"}}>DROP</th>
+                      <th className="wth" style={{fontSize:9,letterSpacing:".04em"}}>VIND</th>
                     </React.Fragment>
                   ))}
                 </tr>
@@ -336,16 +377,16 @@ function App(){
                 return(
                   <tr key={row.len}>
                     <td style={{textAlign:"left",paddingLeft:14,fontFamily:"'Orbitron',monospace",
-                      fontSize:11,letterSpacing:".06em",color:"#94a3b8",fontWeight:700}}>{row.len}</td>
+                      fontSize:11,color:"#94a3b8",fontWeight:700}}>{row.len}</td>
                     <td style={{color:"#475569",fontSize:11}}>{row.mvms}</td>
                     {DISP.map(d=>{
-                      const drop=sdrop(drops,zero,d);
+                      const drop=sdrop(drops,zero,d,sh);
                       const drift=windDrift(tofs[d]||0,d,row.mvms,windMs,wf);
                       return showWind?(
                         <React.Fragment key={d}>
                           <td style={{fontWeight:"bold",color:d===zero?"#4ade80":dcol(drop),
                             background:d===zero?"rgba(74,222,128,.06)":undefined}}>{fmt(drop)}</td>
-                          <td className="wind-td" style={{fontWeight:"bold",color:wcol(drift)}}>
+                          <td className="wtd" style={{fontWeight:"bold",color:wcol(drift)}}>
                             {drift===0?"±0":Math.abs(drift).toFixed(1)+" cm"}
                           </td>
                         </React.Fragment>
@@ -364,7 +405,7 @@ function App(){
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
           <div className="card" style={{padding:"14px 16px"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:"#475569",marginBottom:10}}>FÄRGKODNING</div>
-            <div style={{fontSize:10,color:"#475569",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>Kulfall</div>
+            <div style={{fontSize:10,color:"#475569",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>Kulfall relativt siktlinje</div>
             {[{c:"#4ade80",l:"±0 / ≤5 cm"},{c:"#facc15",l:"≤25 cm"},{c:"#fb923c",l:"≤75 cm"},{c:"#f87171",l:">75 cm"}]
               .map(({c,l})=>(
               <div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}>
@@ -384,13 +425,13 @@ function App(){
           <div style={{background:"rgba(15,23,42,.6)",borderLeft:`3px solid ${cal.color}`,
             padding:"10px 14px",fontSize:11,color:"#64748b",lineHeight:1.8,borderRadius:"0 4px 4px 0"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:"#475569",marginBottom:8}}>OBSERVERA</div>
+            <div>• Kulfall beräknat relativt siktlinje med korrekt sikthöjd</div>
+            <div>• Positiv = kulan är ovanför siktlinjen</div>
+            <div>• Negativ = kulan är under siktlinjen</div>
+            <div>• Kort nollning + snabb kaliber → kulan stiger efter nollningspunkten</div>
             <div>• G1 numerisk integration (dt=0.5ms)</div>
-            <div>• Vindavdrift via lag-regeln</div>
-            <div>• 90° = full crosswind · 45° = half · 0° = ingen</div>
-            <div>• Vindavdrift visas som absolut sidledsavdrift</div>
+            <div>• Vindavdrift via lag-regeln · 90°=full · 45°=half</div>
             <div>• Nollningskolumn markerad med ◉</div>
-            <div>• Positivt kulfall = över siktlinjen</div>
-            <div>• MV varierar ±20–50 m/s beroende på fabrikat</div>
             <div>• Validera med din specifika ammunition</div>
           </div>
         </div>
@@ -423,7 +464,7 @@ function App(){
         <div style={{marginTop:28,paddingTop:16,borderTop:"1px solid #1e293b",display:"flex",
           justifyContent:"space-between",fontSize:10,color:"#334155",
           fontFamily:"'Share Tech Mono',monospace",flexWrap:"wrap",gap:8}}>
-          <span>G1 numerisk integration · Vindavdrift: lag-regel · ISA-standard 15°C</span>
+          <span>G1 numerisk integration · Siktlinje med sikthöjd · Vindavdrift: lag-regel · ISA 15°C</span>
           <span style={{color:"#475569"}}>Validera alltid med din specifika ammunition och nollning</span>
         </div>
       </div>
