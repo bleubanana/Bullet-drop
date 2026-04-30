@@ -7,7 +7,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#080b10}</style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1QPSZMLX4"></script>
   <script>
@@ -16,6 +15,7 @@
     gtag('js', new Date());
     gtag('config', 'G-P1QPSZMLX4');
   </script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#080b10}</style>
 </head>
 <body>
 <div id="root"></div>
@@ -46,14 +46,14 @@ function getCD(mach){
   return G1[G1.length-1][1];
 }
 
-function boreDropAll(bc_g1,mv,dists){
+function simulate(bc_g1,mv,dists){
   const bc=bc_g1*703.07;
   const sorted=[...dists].sort((a,b)=>a-b);
-  const drops={};
-  let x=0,y=0,vx=mv,vy=0,di=0;
+  const drops={},tofs={};
+  let x=0,y=0,vx=mv,vy=0,t=0,di=0;
   const dt=0.0005;
   while(di<sorted.length){
-    while(di<sorted.length&&x>=sorted[di]){drops[sorted[di]]=y*100;di++;}
+    while(di<sorted.length&&x>=sorted[di]){drops[sorted[di]]=y*100;tofs[sorted[di]]=t;di++;}
     if(di>=sorted.length) break;
     const v=Math.sqrt(vx*vx+vy*vy);
     if(v<5) break;
@@ -61,9 +61,9 @@ function boreDropAll(bc_g1,mv,dists){
     const inv=1/v;
     vx+=-ad*vx*inv*dt;
     vy+=(-G_ACC-ad*vy*inv)*dt;
-    x+=vx*dt;y+=vy*dt;
+    x+=vx*dt;y+=vy*dt;t+=dt;
   }
-  return drops;
+  return {drops,tofs};
 }
 
 function sdrop(bd,zero,d){
@@ -71,78 +71,71 @@ function sdrop(bd,zero,d){
   return Math.round((bd[d]-(bd[zero]/zero)*d)*10)/10;
 }
 
+function windDrift(tof,dist,mv,windMs,windFactor){
+  if(windMs===0) return 0;
+  return Math.round(windMs*windFactor*(tof-dist/mv)*100*10)/10;
+}
+
 const CALS={
-  "22lr":{
-    label:".22 LR",color:"#a78bfa",glow:"#a78bfa55",
-    bullets:[
-      {id:"22lr-a",weight:"40 gr",type:"LRN / Standard Velocity",bc:0.129,barrels:[
-        {len:'4"',mvms:280},{len:'6"',mvms:305},{len:'16"',mvms:320},{len:'18"',mvms:325},{len:'20"',mvms:328}]},
-      {id:"22lr-b",weight:"40 gr",type:"LRN / High Velocity",bc:0.129,barrels:[
-        {len:'4"',mvms:340},{len:'6"',mvms:360},{len:'16"',mvms:375},{len:'18"',mvms:380},{len:'20"',mvms:384}]},
-      {id:"22lr-c",weight:"36 gr",type:"CPHP / High Velocity",bc:0.118,barrels:[
-        {len:'4"',mvms:355},{len:'6"',mvms:375},{len:'16"',mvms:390},{len:'18"',mvms:395},{len:'20"',mvms:398}]},
-      {id:"22lr-d",weight:"40 gr",type:"LRN / Subsonic (Eley·SK·CCI)",bc:0.123,barrels:[
-        {len:'4"',mvms:248},{len:'6"',mvms:262},{len:'16"',mvms:283},{len:'18"',mvms:288},{len:'20"',mvms:293}]},
-    ],
-  },
-  "9x19":{
-    label:"9×19 mm",color:"#f59e0b",glow:"#f59e0b55",
-    bullets:[
-      {id:"9x19-a",weight:"115 gr",type:"FMJ / RN",bc:0.135,barrels:[
-        {len:'4"',mvms:351},{len:'8"',mvms:390},{len:'16"',mvms:439},{len:'18"',mvms:450}]},
-      {id:"9x19-b",weight:"124 gr",type:"FMJ / RN",bc:0.142,barrels:[
-        {len:'4"',mvms:330},{len:'8"',mvms:375},{len:'16"',mvms:421},{len:'18"',mvms:430}]},
-      {id:"9x19-c",weight:"147 gr",type:"FMJ / Subsonic",bc:0.165,barrels:[
-        {len:'4"',mvms:290},{len:'8"',mvms:320},{len:'16"',mvms:370},{len:'18"',mvms:380}]},
-    ],
-  },
-  "223rem":{
-    label:".223 Remington",color:"#22d3ee",glow:"#22d3ee55",
-    bullets:[
-      {id:"223-a",weight:"55 gr",type:"FMJ / FMJBT",bc:0.243,barrels:[
-        {len:'8"',mvms:817},{len:'11"',mvms:869},{len:'14.5"',mvms:914},
-        {len:'16"',mvms:945},{len:'18"',mvms:965},{len:'20"',mvms:988}]},
-      {id:"223-b",weight:"62 gr",type:"SS109 / M855",bc:0.307,barrels:[
-        {len:'8"',mvms:777},{len:'11"',mvms:829},{len:'14.5"',mvms:875},
-        {len:'16"',mvms:902},{len:'18"',mvms:921},{len:'20"',mvms:945}]},
-      {id:"223-c",weight:"77 gr",type:"OTM / SMK",bc:0.372,barrels:[
-        {len:'8"',mvms:716},{len:'11"',mvms:762},{len:'14.5"',mvms:808},
-        {len:'16"',mvms:838},{len:'18"',mvms:853},{len:'20"',mvms:869}]},
-    ],
-  },
-  "308win":{
-    label:".308 Winchester",color:"#4ade80",glow:"#4ade8055",
-    bullets:[
-      {id:"308-a",weight:"147 gr",type:"FMJ M80 / FMJBT",bc:0.393,barrels:[
-        {len:'13.5"',mvms:747},{len:'16"',mvms:793},{len:'18"',mvms:817},{len:'20"',mvms:838}]},
-      {id:"308-b",weight:"168 gr",type:"OTM / SMK HPBT",bc:0.475,barrels:[
-        {len:'13.5"',mvms:716},{len:'16"',mvms:762},{len:'18"',mvms:793},{len:'20"',mvms:808}]},
-      {id:"308-c",weight:"175 gr",type:"OTM / SMK HPBT",bc:0.505,barrels:[
-        {len:'13.5"',mvms:701},{len:'16"',mvms:747},{len:'18"',mvms:777},{len:'20"',mvms:793}]},
-    ],
-  },
-  "65cm":{
-    label:"6,5 Creedmoor",color:"#f97316",glow:"#f9731655",
-    bullets:[
-      {id:"65cm-a",weight:"123 gr",type:"OTM / ELD-M",bc:0.510,barrels:[
-        {len:'18"',mvms:838},{len:'20"',mvms:853},{len:'22"',mvms:869},{len:'24"',mvms:884}]},
-      {id:"65cm-b",weight:"140 gr",type:"OTM / SMK HPBT",bc:0.587,barrels:[
-        {len:'18"',mvms:780},{len:'20"',mvms:796},{len:'22"',mvms:811},{len:'24"',mvms:826}]},
-      {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:0.697,barrels:[
-        {len:'18"',mvms:761},{len:'20"',mvms:776},{len:'22"',mvms:793},{len:'24"',mvms:808}]},
-    ],
-  },
+  "22lr":{label:".22 LR",color:"#a78bfa",glow:"#a78bfa55",bullets:[
+    {id:"22lr-a",weight:"40 gr",type:"LRN / Standard Velocity",bc:0.129,barrels:[
+      {len:'4"',mvms:280},{len:'6"',mvms:305},{len:'16"',mvms:320},{len:'18"',mvms:325},{len:'20"',mvms:328}]},
+    {id:"22lr-b",weight:"40 gr",type:"LRN / High Velocity",bc:0.129,barrels:[
+      {len:'4"',mvms:340},{len:'6"',mvms:360},{len:'16"',mvms:375},{len:'18"',mvms:380},{len:'20"',mvms:384}]},
+    {id:"22lr-c",weight:"36 gr",type:"CPHP / High Velocity",bc:0.118,barrels:[
+      {len:'4"',mvms:355},{len:'6"',mvms:375},{len:'16"',mvms:390},{len:'18"',mvms:395},{len:'20"',mvms:398}]},
+    {id:"22lr-d",weight:"40 gr",type:"LRN / Subsonic (Eley·SK·CCI)",bc:0.123,barrels:[
+      {len:'4"',mvms:248},{len:'6"',mvms:262},{len:'16"',mvms:283},{len:'18"',mvms:288},{len:'20"',mvms:293}]},
+  ]},
+  "9x19":{label:"9×19 mm",color:"#f59e0b",glow:"#f59e0b55",bullets:[
+    {id:"9x19-a",weight:"115 gr",type:"FMJ / RN",bc:0.135,barrels:[
+      {len:'4"',mvms:351},{len:'8"',mvms:390},{len:'16"',mvms:439},{len:'18"',mvms:450}]},
+    {id:"9x19-b",weight:"124 gr",type:"FMJ / RN",bc:0.142,barrels:[
+      {len:'4"',mvms:330},{len:'8"',mvms:375},{len:'16"',mvms:421},{len:'18"',mvms:430}]},
+    {id:"9x19-c",weight:"147 gr",type:"FMJ / Subsonic",bc:0.165,barrels:[
+      {len:'4"',mvms:290},{len:'8"',mvms:320},{len:'16"',mvms:370},{len:'18"',mvms:380}]},
+  ]},
+  "223rem":{label:".223 Remington",color:"#22d3ee",glow:"#22d3ee55",bullets:[
+    {id:"223-a",weight:"55 gr",type:"FMJ / FMJBT",bc:0.243,barrels:[
+      {len:'8"',mvms:817},{len:'11"',mvms:869},{len:'14.5"',mvms:914},
+      {len:'16"',mvms:945},{len:'18"',mvms:965},{len:'20"',mvms:988}]},
+    {id:"223-b",weight:"62 gr",type:"SS109 / M855",bc:0.307,barrels:[
+      {len:'8"',mvms:777},{len:'11"',mvms:829},{len:'14.5"',mvms:875},
+      {len:'16"',mvms:902},{len:'18"',mvms:921},{len:'20"',mvms:945}]},
+    {id:"223-c",weight:"77 gr",type:"OTM / SMK",bc:0.372,barrels:[
+      {len:'8"',mvms:716},{len:'11"',mvms:762},{len:'14.5"',mvms:808},
+      {len:'16"',mvms:838},{len:'18"',mvms:853},{len:'20"',mvms:869}]},
+  ]},
+  "308win":{label:".308 Winchester",color:"#4ade80",glow:"#4ade8055",bullets:[
+    {id:"308-a",weight:"147 gr",type:"FMJ M80 / FMJBT",bc:0.393,barrels:[
+      {len:'13.5"',mvms:747},{len:'16"',mvms:793},{len:'18"',mvms:817},{len:'20"',mvms:838}]},
+    {id:"308-b",weight:"168 gr",type:"OTM / SMK HPBT",bc:0.475,barrels:[
+      {len:'13.5"',mvms:716},{len:'16"',mvms:762},{len:'18"',mvms:793},{len:'20"',mvms:808}]},
+    {id:"308-c",weight:"175 gr",type:"OTM / SMK HPBT",bc:0.505,barrels:[
+      {len:'13.5"',mvms:701},{len:'16"',mvms:747},{len:'18"',mvms:777},{len:'20"',mvms:793}]},
+  ]},
+  "65cm":{label:"6,5 Creedmoor",color:"#f97316",glow:"#f9731655",bullets:[
+    {id:"65cm-a",weight:"123 gr",type:"OTM / ELD-M",bc:0.510,barrels:[
+      {len:'18"',mvms:838},{len:'20"',mvms:853},{len:'22"',mvms:869},{len:'24"',mvms:884}]},
+    {id:"65cm-b",weight:"140 gr",type:"OTM / SMK HPBT",bc:0.587,barrels:[
+      {len:'18"',mvms:780},{len:'20"',mvms:796},{len:'22"',mvms:811},{len:'24"',mvms:826}]},
+    {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:0.697,barrels:[
+      {len:'18"',mvms:761},{len:'20"',mvms:776},{len:'22"',mvms:793},{len:'24"',mvms:808}]},
+  ]},
 };
 
 const TABS=[
-  {id:"22lr",label:".22 LR"},
-  {id:"9x19",label:"9×19 mm"},
-  {id:"223rem",label:".223 Rem"},
-  {id:"308win",label:".308 Win"},
-  {id:"65cm",label:"6,5 Creed"},
+  {id:"22lr",label:".22 LR"},{id:"9x19",label:"9×19 mm"},
+  {id:"223rem",label:".223 Rem"},{id:"308win",label:".308 Win"},{id:"65cm",label:"6,5 Creed"},
 ];
 
 const PISTOL_CALS=["22lr","9x19"];
+
+const WIND_DIRS=[
+  {id:"no",   label:"0°",  factor:0,   desc:"Medvind/motvind"},
+  {id:"half", label:"45°", factor:0.5, desc:"Half value"},
+  {id:"full", label:"90°", factor:1.0, desc:"Full value"},
+];
 
 function dcol(v){
   if(v===0) return "#4ade80";
@@ -151,6 +144,14 @@ function dcol(v){
   if(a<=25) return "#facc15";
   if(a<=75) return "#fb923c";
   return "#f87171";
+}
+function wcol(v){
+  if(v===0) return "#94a3b8";
+  const a=Math.abs(v);
+  if(a<=5) return "#67e8f9";
+  if(a<=20) return "#38bdf8";
+  if(a<=50) return "#818cf8";
+  return "#c084fc";
 }
 function fmt(v){
   if(v===0) return "±0";
@@ -161,23 +162,24 @@ function App(){
   const [tab,setTab]=useState("22lr");
   const [bi,setBi]=useState(0);
   const [zero,setZero]=useState(25);
+  const [windMs,setWindMs]=useState(0);
+  const [windDir,setWindDir]=useState("full");
 
   const cal=CALS[tab];
   const bul=cal.bullets[bi];
+  const wf=WIND_DIRS.find(d=>d.id===windDir).factor;
 
   const pc=useMemo(()=>{
     const r={};
     Object.entries(CALS).forEach(([cid,c])=>{
-      r[cid]=c.bullets.map(b=>b.barrels.map(bar=>boreDropAll(b.bc,bar.mvms,DISP)));
+      r[cid]=c.bullets.map(b=>b.barrels.map(bar=>simulate(b.bc,bar.mvms,DISP)));
     });
     return r;
   },[]);
 
-  function switchTab(id){
-    setTab(id);
-    setBi(0);
-    setZero(PISTOL_CALS.includes(id)?25:100);
-  }
+  function switchTab(id){setTab(id);setBi(0);setZero(PISTOL_CALS.includes(id)?25:100);}
+
+  const showWind=windMs>0;
 
   return(
     <div style={{minHeight:"100vh",background:"#080b10",color:"#e2e8f0",
@@ -202,12 +204,22 @@ function App(){
           cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;transition:all .15s;border-radius:3px}
         .zbtn:hover{color:#94a3b8;border-color:#334155}
         .zbtn.on{color:var(--cc);border-color:var(--cc);background:var(--cg);box-shadow:0 0 10px var(--cg)}
+        .wbtn{background:transparent;border:1px solid #1e293b;color:#64748b;padding:7px 14px;
+          cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;border-radius:3px}
+        .wbtn:hover{color:#94a3b8;border-color:#334155}
+        .wbtn.on{color:#38bdf8;border-color:#38bdf8;background:rgba(56,189,248,.12);box-shadow:0 0 10px rgba(56,189,248,.2)}
         .card{background:rgba(15,23,42,.8);border:1px solid #1e293b;border-radius:6px}
         .dt{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:12px}
         .dt th{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.08em;color:#475569;
-          text-transform:uppercase;padding:10px 12px;text-align:center;border-bottom:1px solid #1e293b}
-        .dt td{padding:10px 12px;text-align:center;border-bottom:1px solid #0f172a}
+          text-transform:uppercase;padding:8px 10px;text-align:center;border-bottom:1px solid #1e293b}
+        .dt th.wind-th{color:#38bdf8;opacity:.85}
+        .dt td{padding:8px 10px;text-align:center;border-bottom:1px solid #0f172a}
         .dt tr:hover td{background:rgba(255,255,255,.02)}
+        .wind-td{background:rgba(56,189,248,.03)}
+        input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;
+          background:linear-gradient(90deg,#38bdf8 var(--pct,0%),#1e293b var(--pct,0%));outline:none}
+        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+          border-radius:50%;background:#38bdf8;cursor:pointer;box-shadow:0 0 8px rgba(56,189,248,.5)}
       `}</style>
 
       <div className="grid-bg"/>
@@ -218,7 +230,7 @@ function App(){
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:28}}>
           <div>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:11,letterSpacing:".25em",
-              color:cal.color,textTransform:"uppercase",marginBottom:6,opacity:.8}}>◈ Taktisk Lathund · Kulfall</div>
+              color:cal.color,textTransform:"uppercase",marginBottom:6,opacity:.8}}>◈ Taktisk Lathund · Kulfall & Vindavdrift</div>
             <h1 style={{fontFamily:"'Orbitron',monospace",fontSize:28,fontWeight:900,color:"#f1f5f9",
               letterSpacing:".06em",textShadow:`0 0 30px ${cal.glow}`,lineHeight:1.1}}>
               BULLET DROP<br/><span style={{color:cal.color,fontSize:20}}>REFERENSGUIDE</span>
@@ -235,31 +247,48 @@ function App(){
           {TABS.map(t=>(
             <button key={t.id} className={`tab-btn${tab===t.id?" on":""}`}
               style={{"--cc":CALS[t.id].color,"--cg":CALS[t.id].glow}}
-              onClick={()=>switchTab(t.id)}>
-              {t.label}
-            </button>
+              onClick={()=>switchTab(t.id)}>{t.label}</button>
           ))}
         </div>
 
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:22,
-          padding:"14px 18px",background:"rgba(15,23,42,.6)",
-          border:`1px solid ${cal.color}33`,borderRadius:6,flexWrap:"wrap"}}>
-          <span style={{fontFamily:"'Orbitron',monospace",fontSize:11,letterSpacing:".12em",
-            color:cal.color,textTransform:"uppercase",marginRight:6,opacity:.7}}>Nollning:</span>
-          {ZEROS.map(z=>(
-            <button key={z} className={`zbtn${zero===z?" on":""}`}
-              style={{"--cc":cal.color,"--cg":cal.glow}}
-              onClick={()=>setZero(z)}>{z} m</button>
-          ))}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:22}}>
+          <div style={{padding:"14px 18px",background:"rgba(15,23,42,.6)",
+            border:`1px solid ${cal.color}33`,borderRadius:6}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",
+              color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.7}}>Nollning</div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              {ZEROS.map(z=>(
+                <button key={z} className={`zbtn${zero===z?" on":""}`}
+                  style={{"--cc":cal.color,"--cg":cal.glow}}
+                  onClick={()=>setZero(z)}>{z} m</button>
+              ))}
+            </div>
+          </div>
+          <div style={{padding:"14px 18px",background:"rgba(15,23,42,.6)",
+            border:"1px solid rgba(56,189,248,.2)",borderRadius:6}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",
+              color:"#38bdf8",textTransform:"uppercase",marginBottom:10,opacity:.7}}>
+              Vind — {windMs} m/s
+            </div>
+            <input type="range" min="0" max="10" step="0.5" value={windMs}
+              style={{"--pct":`${windMs*10}%`}}
+              onChange={e=>setWindMs(parseFloat(e.target.value))}/>
+            <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
+              {WIND_DIRS.map(d=>(
+                <button key={d.id} className={`wbtn${windDir===d.id?" on":""}`}
+                  onClick={()=>setWindDir(d.id)}>
+                  {d.label} <span style={{fontSize:9,opacity:.6}}>{d.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
           {cal.bullets.map((b,i)=>(
             <button key={b.id} className={`pill${bi===i?" on":""}`}
               style={{"--cc":cal.color,"--cg":cal.glow}}
-              onClick={()=>setBi(i)}>
-              {b.weight} {b.type}
-            </button>
+              onClick={()=>setBi(i)}>{b.weight} {b.type}</button>
           ))}
         </div>
 
@@ -269,19 +298,18 @@ function App(){
           <span style={{color:cal.color,fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:13}}>{bul.weight}</span>
           <span style={{color:"#64748b",fontSize:12}}>{bul.type}</span>
           <span style={{color:"#475569",fontSize:11}}>BC {bul.bc} G1</span>
-          <span style={{color:"#475569",fontSize:11}}>
-            Nollning: <span style={{color:cal.color,fontWeight:"bold"}}>{zero} m</span>
-          </span>
+          <span style={{color:"#475569",fontSize:11}}>Nollning: <span style={{color:cal.color,fontWeight:"bold"}}>{zero} m</span></span>
+          {showWind&&<span style={{color:"#38bdf8",fontSize:11}}>Vind: <strong>{windMs} m/s</strong> · {WIND_DIRS.find(d=>d.id===windDir).label}</span>}
         </div>
 
         <div className="card" style={{marginBottom:20,overflowX:"auto"}}>
           <table className="dt">
             <thead>
               <tr>
-                <th style={{textAlign:"left",paddingLeft:18}}>Pip</th>
+                <th style={{textAlign:"left",paddingLeft:14}}>Pip</th>
                 <th>m/s</th>
                 {DISP.map(d=>(
-                  <th key={d} style={{
+                  <th key={d} colSpan={showWind?2:1} style={{
                     color:d===zero?"#fff":cal.color,opacity:d===zero?1:.8,
                     fontWeight:d===zero?900:undefined,
                     background:d===zero?"rgba(255,255,255,.04)":undefined}}>
@@ -289,23 +317,41 @@ function App(){
                   </th>
                 ))}
               </tr>
+              {showWind&&(
+                <tr>
+                  <th style={{color:"#334155",fontSize:9}}></th>
+                  <th style={{color:"#334155",fontSize:9}}></th>
+                  {DISP.map(d=>(
+                    <React.Fragment key={d}>
+                      <th style={{color:"#475569",fontSize:9,letterSpacing:".05em"}}>DROP</th>
+                      <th className="wind-th" style={{fontSize:9,letterSpacing:".05em"}}>VIND</th>
+                    </React.Fragment>
+                  ))}
+                </tr>
+              )}
             </thead>
             <tbody>
               {bul.barrels.map((row,ri)=>{
-                const bd=pc[tab][bi][ri];
+                const {drops,tofs}=pc[tab][bi][ri];
                 return(
                   <tr key={row.len}>
-                    <td style={{textAlign:"left",paddingLeft:18,fontFamily:"'Orbitron',monospace",
+                    <td style={{textAlign:"left",paddingLeft:14,fontFamily:"'Orbitron',monospace",
                       fontSize:11,letterSpacing:".06em",color:"#94a3b8",fontWeight:700}}>{row.len}</td>
                     <td style={{color:"#475569",fontSize:11}}>{row.mvms}</td>
                     {DISP.map(d=>{
-                      const drop=sdrop(bd,zero,d);
-                      return(
-                        <td key={d} style={{fontWeight:"bold",
-                          color:d===zero?"#4ade80":dcol(drop),
-                          background:d===zero?"rgba(74,222,128,.06)":undefined}}>
-                          {fmt(drop)}
-                        </td>
+                      const drop=sdrop(drops,zero,d);
+                      const drift=windDrift(tofs[d]||0,d,row.mvms,windMs,wf);
+                      return showWind?(
+                        <React.Fragment key={d}>
+                          <td style={{fontWeight:"bold",color:d===zero?"#4ade80":dcol(drop),
+                            background:d===zero?"rgba(74,222,128,.06)":undefined}}>{fmt(drop)}</td>
+                          <td className="wind-td" style={{fontWeight:"bold",color:wcol(drift)}}>
+                            {drift===0?"±0":Math.abs(drift).toFixed(1)+" cm"}
+                          </td>
+                        </React.Fragment>
+                      ):(
+                        <td key={d} style={{fontWeight:"bold",color:d===zero?"#4ade80":dcol(drop),
+                          background:d===zero?"rgba(74,222,128,.06)":undefined}}>{fmt(drop)}</td>
                       );
                     })}
                   </tr>
@@ -317,14 +363,19 @@ function App(){
 
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
           <div className="card" style={{padding:"14px 16px"}}>
-            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:"#475569",marginBottom:10}}>FÄRGKODNING KULFALL</div>
-            {[
-              {c:"#4ade80",l:"±0 / ≤5 cm — Minimal korrigering"},
-              {c:"#facc15",l:"≤25 cm — Måttlig korrigering"},
-              {c:"#fb923c",l:"≤75 cm — Stor korrigering"},
-              {c:"#f87171",l:">75 cm — Extrem drop"},
-            ].map(({c,l})=>(
-              <div key={c} style={{display:"flex",alignItems:"center",marginBottom:6,fontSize:11}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:"#475569",marginBottom:10}}>FÄRGKODNING</div>
+            <div style={{fontSize:10,color:"#475569",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>Kulfall</div>
+            {[{c:"#4ade80",l:"±0 / ≤5 cm"},{c:"#facc15",l:"≤25 cm"},{c:"#fb923c",l:"≤75 cm"},{c:"#f87171",l:">75 cm"}]
+              .map(({c,l})=>(
+              <div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}>
+                <span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/>
+                <span style={{color:"#94a3b8"}}>{l}</span>
+              </div>
+            ))}
+            <div style={{fontSize:10,color:"#475569",textTransform:"uppercase",letterSpacing:".06em",marginTop:10,marginBottom:6}}>Vindavdrift</div>
+            {[{c:"#67e8f9",l:"≤5 cm"},{c:"#38bdf8",l:"≤20 cm"},{c:"#818cf8",l:"≤50 cm"},{c:"#c084fc",l:">50 cm"}]
+              .map(({c,l})=>(
+              <div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}>
                 <span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/>
                 <span style={{color:"#94a3b8"}}>{l}</span>
               </div>
@@ -334,10 +385,12 @@ function App(){
             padding:"10px 14px",fontSize:11,color:"#64748b",lineHeight:1.8,borderRadius:"0 4px 4px 0"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:"#475569",marginBottom:8}}>OBSERVERA</div>
             <div>• G1 numerisk integration (dt=0.5ms)</div>
+            <div>• Vindavdrift via lag-regeln</div>
+            <div>• 90° = full crosswind · 45° = half · 0° = ingen</div>
+            <div>• Vindavdrift visas som absolut sidledsavdrift</div>
             <div>• Nollningskolumn markerad med ◉</div>
-            <div>• Positivt värde = över siktlinjen</div>
+            <div>• Positivt kulfall = över siktlinjen</div>
             <div>• MV varierar ±20–50 m/s beroende på fabrikat</div>
-            <div>• Vinddrift ej inkluderad</div>
             <div>• Validera med din specifika ammunition</div>
           </div>
         </div>
@@ -349,16 +402,14 @@ function App(){
             <table className="dt">
               <thead>
                 <tr>
-                  <th style={{textAlign:"left",paddingLeft:18}}>Kulvikt</th>
-                  {cal.bullets[0].barrels.map(b=>(
-                    <th key={b.len} style={{color:"#64748b"}}>{b.len}</th>
-                  ))}
+                  <th style={{textAlign:"left",paddingLeft:14}}>Kulvikt</th>
+                  {cal.bullets[0].barrels.map(b=><th key={b.len} style={{color:"#64748b"}}>{b.len}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {cal.bullets.map(b=>(
                   <tr key={b.id}>
-                    <td style={{textAlign:"left",paddingLeft:18,color:"#94a3b8",fontSize:12}}>{b.weight} {b.type}</td>
+                    <td style={{textAlign:"left",paddingLeft:14,color:"#94a3b8",fontSize:12}}>{b.weight} {b.type}</td>
                     {b.barrels.map(row=>(
                       <td key={row.len} style={{color:cal.color,opacity:.85}}>{row.mvms} m/s</td>
                     ))}
@@ -372,7 +423,7 @@ function App(){
         <div style={{marginTop:28,paddingTop:16,borderTop:"1px solid #1e293b",display:"flex",
           justifyContent:"space-between",fontSize:10,color:"#334155",
           fontFamily:"'Share Tech Mono',monospace",flexWrap:"wrap",gap:8}}>
-          <span>G1 ballistisk beräkning · ISA-standard 15°C · dt=0.5ms</span>
+          <span>G1 numerisk integration · Vindavdrift: lag-regel · ISA-standard 15°C</span>
           <span style={{color:"#475569"}}>Validera alltid med din specifika ammunition och nollning</span>
         </div>
       </div>
