@@ -61,12 +61,36 @@ const CALS={
     {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:.697,barrels:[{len:'18"',mvms:761},{len:'20"',mvms:776},{len:'22"',mvms:793},{len:'24"',mvms:808}]},
   ]},
 };
-const VERSION="1.1.6";
+const VERSION="1.1.7";
 const TABS=[{id:"22lr",label:".22 LR"},{id:"9x19",label:"9×19 mm"},{id:"223rem",label:".223 Rem"},{id:"308win",label:".308 Win"},{id:"65cm",label:"6,5 Creed"}];
 
 function dcol(v,dark){if(v===0)return dark?"#4ade80":"#16a34a";const a=Math.abs(v);if(a<=5)return dark?"#4ade80":"#16a34a";if(a<=25)return dark?"#facc15":"#ca8a04";if(a<=75)return dark?"#fb923c":"#ea580c";return dark?"#f87171":"#dc2626";}
 function wcol(v,dark){if(v===0)return"#94a3b8";const a=Math.abs(v);if(a<=5)return dark?"#67e8f9":"#0891b2";if(a<=20)return dark?"#38bdf8":"#0369a1";if(a<=50)return dark?"#818cf8":"#6d28d9";return dark?"#c084fc":"#9333ea";}
 function fmt(v){if(v===0)return"±0";return(v>0?"+":"")+v.toFixed(1);}
+
+function handlePrint(){
+  const el=document.getElementById('crib-print-area');
+  if(!el)return;
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  document.body.appendChild(iframe);
+  const doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:#0f172a;font-family:'Share Tech Mono','Courier New',monospace;padding:24px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+th{padding:6px 8px;font-family:'Orbitron','Courier New',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f1f5f9;border-bottom:1px solid #cbd5e1}
+td{padding:7px 8px;text-align:center;border-bottom:1px solid #e2e8f0;color:#0f172a}
+td:first-child,th:first-child{text-align:left}
+strong{font-weight:700}
+.no-print{display:none!important}
+</style></head><body>${el.innerHTML}</body></html>`);
+  doc.close();
+  iframe.onload=()=>{iframe.contentWindow.focus();iframe.contentWindow.print();document.body.removeChild(iframe);};
+}
 
 function CribModal({t,cal,bul,zero,sh,temp,windMs,windDir,pc,tab,bi,isDark,onClose}){
   const wf=(t.windDirs.find(d=>d.id===windDir)||{factor:0}).factor;
@@ -125,7 +149,7 @@ function CribModal({t,cal,bul,zero,sh,temp,windMs,windDir,pc,tab,bi,isDark,onClo
           <span>{t.cribFooter}</span><span>tacticaljunkyard.com</span>
         </div>
         <div className="no-print" style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
-          <button onClick={()=>window.print()} style={{background:cal.color,border:"none",color:"#fff",padding:"10px 22px",cursor:"pointer",fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:12,letterSpacing:".08em",borderRadius:4}}>🖨 {t.print}</button>
+          <button onClick={handlePrint} style={{background:cal.color,border:"none",color:"#fff",padding:"10px 22px",cursor:"pointer",fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:12,letterSpacing:".08em",borderRadius:4}}>🖨 {t.print}</button>
           <button onClick={onClose} style={{background:"transparent",border:`1px solid ${isDark?"#334155":"#cbd5e1"}`,color:isDark?"#64748b":"#475569",padding:"10px 22px",cursor:"pointer",fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:12,letterSpacing:".08em",borderRadius:4}}>{t.close}</button>
         </div>
       </div>
@@ -209,7 +233,7 @@ function App(){
         .light .ctl-btn.on{color:#0f172a;border-color:#0f172a;background:rgba(0,0,0,.07)}
         .crib-btn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:8px 16px;cursor:pointer;font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:.08em;border-radius:4px;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
         .crib-btn:hover{color:var(--cc);border-color:var(--cc)}
-        @media print{body,html{background:#fff!important}body>div>:not(#crib-overlay){display:none!important}#crib-overlay{background:transparent!important;backdrop-filter:none!important}#crib-print-area{border:none!important;border-radius:0!important;max-height:none!important;overflow:visible!important;background:#fff!important;color:#0f172a!important;width:100%!important;max-width:100%!important;box-shadow:none!important}#crib-print-area *{color:#0f172a!important;background:transparent!important;border-color:#94a3b8!important}#crib-print-area th{background:#f1f5f9!important}.no-print{display:none!important}}
+        @media print{body>div>*{display:none!important}}
       `}</style>
 
       <div className="grid-bg"/>
