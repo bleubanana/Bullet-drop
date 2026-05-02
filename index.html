@@ -4,18 +4,15 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bullet Drop Referensguide · tacticaljunkyard.com</title>
-  <!-- PWA -->
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#080b10"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="BulletDrop"/>
   <link rel="apple-touch-icon" href="/icon-192.png"/>
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1QPSZMLX4"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P1QPSZMLX4');</script>
   <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#080b10}</style>
@@ -35,7 +32,7 @@ const T={
 
 const SOUND=340,G_ACC=9.81,RHO_ISA=1.225,T_ISA=288.15;
 const DISP=[25,50,100,150,200,300],ZEROS=[25,50,100,150,200],PISTOL_CALS=["22lr","9x19"];
-const VERSION="1.2.1";
+const VERSION="1.3.1";
 
 const G1=[[0,.2629],[.05,.2558],[.1,.2487],[.15,.2413],[.2,.2335],[.25,.2259],[.3,.2177],[.35,.2093],[.4,.2006],[.45,.1913],[.5,.182],[.55,.173],[.6,.1684],[.65,.1679],[.7,.17],[.75,.1806],[.8,.1945],[.85,.2155],[.9,.2395],[.95,.2728],[1,.3049],[1.05,.3733],[1.1,.4064],[1.15,.4132],[1.2,.3945],[1.25,.3782],[1.3,.3617],[1.4,.3349],[1.5,.3149],[1.6,.2999],[1.8,.2742],[2,.2547],[2.2,.2407],[2.4,.2297],[2.6,.22],[2.8,.2118],[3,.2048]];
 function getCD(m){if(m<=G1[0][0])return G1[0][1];for(let i=1;i<G1.length;i++){if(m<=G1[i][0]){const f=(m-G1[i-1][0])/(G1[i][0]-G1[i-1][0]);return G1[i-1][1]+f*(G1[i][1]-G1[i-1][1]);}}return G1[G1.length-1][1];}
@@ -43,34 +40,85 @@ function simulate(bc_g1,mv,dists,rho){const bc=bc_g1*703.07,sorted=[...dists].so
 function sdrop(drops,zero,d,sh){if(d===zero)return 0;return Math.round((drops[d]-sh*(1-d/zero)-drops[zero]*(d/zero))*10)/10;}
 function windDrift(tof,dist,mv,w,wf){if(w===0)return 0;return Math.round(w*wf*(tof-dist/mv)*100*10)/10;}
 
+// ─── Ballistikdata — MV korrigerade mot empiriska cut-down-tester ─────────────
+// Källor: BBTI, Rifleshooter.com (cut-down tester), Firearmwiki
+//
+// 9x19:  Platå vid ~8-10", sedan minimal ökning, 17-18" tappar hastighet vs 16"
+//         Källa: BBTI / Firearmwiki — ~100fps total ökning från 4" till 18"
+//
+// .22LR: Platå vid ~14-16", sedan svag minskning pga friktion dominerar
+//         Källa: BBTI / historisk RCMP-data
+//
+// .223:  Linjär ökning ~30-50fps/inch, korrekt genom hela 8-20" spannet
+//         Källa: Rifleshooter cut-down test (26" till 6")
+//
+// .308:  Linjär ~22.7fps/inch (avg av 4 laddningar), Berger manual säger ~20fps/inch
+//         Källa: Rifleshooter cut-down test (28" till 6")
+//
+// 6.5CM: Linjär ~22-27fps/inch, 140gr baserad på Rifleshooter 2019-test
+//         Källa: Rifleshooter cut-down test (26" till 17")
+
 const CALS={
+  // .22 LR — peak ca 14-16", svag minskning vid 18-20"
   "22lr":{label:".22 LR",color:"#a78bfa",glow:"#a78bfa55",bullets:[
-    {id:"22lr-a",weight:"40 gr",type:"LRN / Standard Velocity",bc:.129,barrels:[{len:'4"',mvms:280},{len:'6"',mvms:305},{len:'16"',mvms:320},{len:'18"',mvms:325},{len:'20"',mvms:328}]},
-    {id:"22lr-b",weight:"40 gr",type:"LRN / High Velocity",bc:.129,barrels:[{len:'4"',mvms:340},{len:'6"',mvms:360},{len:'16"',mvms:375},{len:'18"',mvms:380},{len:'20"',mvms:384}]},
-    {id:"22lr-c",weight:"36 gr",type:"CPHP / High Velocity",bc:.118,barrels:[{len:'4"',mvms:355},{len:'6"',mvms:375},{len:'16"',mvms:390},{len:'18"',mvms:395},{len:'20"',mvms:398}]},
-    {id:"22lr-d",weight:"40 gr",type:"LRN / Subsonic (Eley·SK·CCI)",bc:.123,barrels:[{len:'4"',mvms:248},{len:'6"',mvms:262},{len:'16"',mvms:283},{len:'18"',mvms:288},{len:'20"',mvms:293}]},
+    {id:"22lr-a",weight:"40 gr",type:"LRN / Standard Velocity",bc:.129,barrels:[
+      {len:'4"',mvms:280},{len:'6"',mvms:305},{len:'16"',mvms:321},{len:'18"',mvms:320},{len:'20"',mvms:317}]},
+    {id:"22lr-b",weight:"40 gr",type:"LRN / High Velocity",bc:.129,barrels:[
+      {len:'4"',mvms:340},{len:'6"',mvms:360},{len:'16"',mvms:378},{len:'18"',mvms:376},{len:'20"',mvms:372}]},
+    {id:"22lr-c",weight:"36 gr",type:"CPHP / High Velocity",bc:.118,barrels:[
+      {len:'4"',mvms:355},{len:'6"',mvms:375},{len:'16"',mvms:393},{len:'18"',mvms:391},{len:'20"',mvms:386}]},
+    {id:"22lr-d",weight:"40 gr",type:"LRN / Subsonic (Eley·SK·CCI)",bc:.123,barrels:[
+      {len:'4"',mvms:248},{len:'6"',mvms:262},{len:'16"',mvms:284},{len:'18"',mvms:283},{len:'20"',mvms:281}]},
   ]},
+
+  // 9x19 — KORRIGERAT: platå vid 8-10", 16-18" visar realistisk marginell ökning/platå
+  // Källa: BBTI data visar <100fps total från 4" till 18" för de flesta laddningar
+  // 17-18" tappar faktiskt hastighet vs 16" i majoriteten av testade laddningar
   "9x19":{label:"9×19 mm",color:"#f59e0b",glow:"#f59e0b55",bullets:[
-    {id:"9x19-a",weight:"115 gr",type:"FMJ / RN",bc:.135,barrels:[{len:'4"',mvms:351},{len:'8"',mvms:390},{len:'16"',mvms:439},{len:'18"',mvms:450}]},
-    {id:"9x19-b",weight:"124 gr",type:"FMJ / RN",bc:.142,barrels:[{len:'4"',mvms:330},{len:'8"',mvms:375},{len:'16"',mvms:421},{len:'18"',mvms:430}]},
-    {id:"9x19-c",weight:"147 gr",type:"FMJ / Subsonic",bc:.165,barrels:[{len:'4"',mvms:290},{len:'8"',mvms:320},{len:'16"',mvms:370},{len:'18"',mvms:380}]},
+    {id:"9x19-a",weight:"115 gr",type:"FMJ / RN",bc:.135,barrels:[
+      {len:'4"',mvms:351},{len:'8"',mvms:390},{len:'10"',mvms:397},{len:'16"',mvms:395},{len:'18"',mvms:391}]},
+    {id:"9x19-b",weight:"124 gr",type:"FMJ / RN",bc:.142,barrels:[
+      {len:'4"',mvms:330},{len:'8"',mvms:375},{len:'10"',mvms:382},{len:'16"',mvms:380},{len:'18"',mvms:376}]},
+    {id:"9x19-c",weight:"147 gr",type:"FMJ / Subsonic",bc:.165,barrels:[
+      {len:'4"',mvms:290},{len:'8"',mvms:320},{len:'10"',mvms:326},{len:'16"',mvms:324},{len:'18"',mvms:320}]},
   ]},
+
+  // .223 Rem — linjär ökning ~30-50fps/inch, värden bekräftade mot rifleshooter
   "223rem":{label:".223 Remington",color:"#0ea5e9",glow:"#0ea5e955",bullets:[
-    {id:"223-a",weight:"55 gr",type:"FMJ / FMJBT",bc:.243,barrels:[{len:'8"',mvms:817},{len:'11"',mvms:869},{len:'14.5"',mvms:914},{len:'16"',mvms:945},{len:'18"',mvms:965},{len:'20"',mvms:988}]},
-    {id:"223-b",weight:"62 gr",type:"SS109 / M855",bc:.307,barrels:[{len:'8"',mvms:777},{len:'11"',mvms:829},{len:'14.5"',mvms:875},{len:'16"',mvms:902},{len:'18"',mvms:921},{len:'20"',mvms:945}]},
-    {id:"223-c",weight:"77 gr",type:"OTM / SMK",bc:.372,barrels:[{len:'8"',mvms:716},{len:'11"',mvms:762},{len:'14.5"',mvms:808},{len:'16"',mvms:838},{len:'18"',mvms:853},{len:'20"',mvms:869}]},
+    {id:"223-a",weight:"55 gr",type:"FMJ / FMJBT",bc:.243,barrels:[
+      {len:'8"',mvms:817},{len:'11"',mvms:869},{len:'14.5"',mvms:914},
+      {len:'16"',mvms:945},{len:'18"',mvms:965},{len:'20"',mvms:988}]},
+    {id:"223-b",weight:"62 gr",type:"SS109 / M855",bc:.307,barrels:[
+      {len:'8"',mvms:777},{len:'11"',mvms:829},{len:'14.5"',mvms:875},
+      {len:'16"',mvms:902},{len:'18"',mvms:921},{len:'20"',mvms:945}]},
+    {id:"223-c",weight:"77 gr",type:"OTM / SMK",bc:.372,barrels:[
+      {len:'8"',mvms:716},{len:'11"',mvms:762},{len:'14.5"',mvms:808},
+      {len:'16"',mvms:838},{len:'18"',mvms:853},{len:'20"',mvms:869}]},
   ]},
+
+  // .308 Win — KORRIGERAT: ~6.7 m/s/inch (22fps/inch), baserat på rifleshooter cut-down
+  // 13.5" var tidigare för lågt, 18-20" var för högt
   "308win":{label:".308 Winchester",color:"#22c55e",glow:"#22c55e55",bullets:[
-    {id:"308-a",weight:"147 gr",type:"FMJ M80 / FMJBT",bc:.393,barrels:[{len:'13.5"',mvms:747},{len:'16"',mvms:793},{len:'18"',mvms:817},{len:'20"',mvms:838}]},
-    {id:"308-b",weight:"168 gr",type:"OTM / SMK HPBT",bc:.475,barrels:[{len:'13.5"',mvms:716},{len:'16"',mvms:762},{len:'18"',mvms:793},{len:'20"',mvms:808}]},
-    {id:"308-c",weight:"175 gr",type:"OTM / SMK HPBT",bc:.505,barrels:[{len:'13.5"',mvms:701},{len:'16"',mvms:747},{len:'18"',mvms:777},{len:'20"',mvms:793}]},
+    {id:"308-a",weight:"147 gr",type:"FMJ M80 / FMJBT",bc:.393,barrels:[
+      {len:'13.5"',mvms:780},{len:'16"',mvms:796},{len:'18"',mvms:809},{len:'20"',mvms:822}]},
+    {id:"308-b",weight:"168 gr",type:"OTM / SMK HPBT",bc:.475,barrels:[
+      {len:'13.5"',mvms:751},{len:'16"',mvms:766},{len:'18"',mvms:779},{len:'20"',mvms:792}]},
+    {id:"308-c",weight:"175 gr",type:"OTM / SMK HPBT",bc:.505,barrels:[
+      {len:'13.5"',mvms:737},{len:'16"',mvms:754},{len:'18"',mvms:767},{len:'20"',mvms:781}]},
   ]},
+
+  // 6.5 CM — KORRIGERAT: 140gr baserat på rifleshooter 2019 (~6.7 m/s/inch)
+  // 147gr ELD-M uppjusterat mot Hornady publicerat data (2695fps/24")
   "65cm":{label:"6,5 Creedmoor",color:"#f97316",glow:"#f9731655",bullets:[
-    {id:"65cm-a",weight:"123 gr",type:"OTM / ELD-M",bc:.510,barrels:[{len:'18"',mvms:838},{len:'20"',mvms:853},{len:'22"',mvms:869},{len:'24"',mvms:884}]},
-    {id:"65cm-b",weight:"140 gr",type:"OTM / SMK HPBT",bc:.587,barrels:[{len:'18"',mvms:780},{len:'20"',mvms:796},{len:'22"',mvms:811},{len:'24"',mvms:826}]},
-    {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:.697,barrels:[{len:'18"',mvms:761},{len:'20"',mvms:776},{len:'22"',mvms:793},{len:'24"',mvms:808}]},
+    {id:"65cm-a",weight:"123 gr",type:"OTM / ELD-M",bc:.510,barrels:[
+      {len:'18"',mvms:845},{len:'20"',mvms:859},{len:'22"',mvms:872},{len:'24"',mvms:886}]},
+    {id:"65cm-b",weight:"140 gr",type:"OTM / SMK HPBT",bc:.587,barrels:[
+      {len:'18"',mvms:767},{len:'20"',mvms:781},{len:'22"',mvms:794},{len:'24"',mvms:808}]},
+    {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:.697,barrels:[
+      {len:'18"',mvms:780},{len:'20"',mvms:794},{len:'22"',mvms:807},{len:'24"',mvms:821}]},
   ]},
 };
+
 const TABS=[{id:"22lr",label:".22 LR"},{id:"9x19",label:"9×19 mm"},{id:"223rem",label:".223 Rem"},{id:"308win",label:".308 Win"},{id:"65cm",label:"6,5 Creed"}];
 
 function dcol(v,dark){if(v===0)return dark?"#4ade80":"#16a34a";const a=Math.abs(v);if(a<=5)return dark?"#4ade80":"#16a34a";if(a<=25)return dark?"#facc15":"#ca8a04";if(a<=75)return dark?"#fb923c":"#ea580c";return dark?"#f87171":"#dc2626";}
@@ -78,18 +126,11 @@ function wcol(v,dark){if(v===0)return"#94a3b8";const a=Math.abs(v);if(a<=5)retur
 function fmt(v){if(v===0)return"±0";return(v>0?"+":"")+v.toFixed(1);}
 
 function handlePrint(){
-  const el=document.getElementById('crib-print-area');
-  if(!el)return;
-  const iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
-  document.body.appendChild(iframe);
-  const doc=iframe.contentDocument||iframe.contentWindow.document;
-  doc.open();
-  doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#fff;color:#0f172a;font-family:'Share Tech Mono','Courier New',monospace;padding:24px}table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}th{padding:6px 8px;font-family:'Orbitron','Courier New',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f1f5f9;border-bottom:1px solid #cbd5e1}td{padding:7px 8px;text-align:center;border-bottom:1px solid #e2e8f0;color:#0f172a}td:first-child,th:first-child{text-align:left}strong{font-weight:700}.no-print{display:none!important}</style></head><body>${el.innerHTML}</body></html>`);
-  doc.close();
-  iframe.onload=()=>{iframe.contentWindow.focus();iframe.contentWindow.print();document.body.removeChild(iframe);};
+  const el=document.getElementById('crib-print-area');if(!el)return;
+  const iframe=document.createElement('iframe');iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(iframe);
+  const doc=iframe.contentDocument||iframe.contentWindow.document;doc.open();
+  doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#fff;color:#0f172a;font-family:'Share Tech Mono','Courier New',monospace;padding:24px}table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}th{padding:6px 8px;font-family:'Orbitron','Courier New',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f1f5f9;border-bottom:1px solid #cbd5e1}td{padding:7px 8px;text-align:center;border-bottom:1px solid #e2e8f0;color:#0f172a}td:first-child,th:first-child{text-align:left}strong{font-weight:700}.no-print{display:none!important}</style></head><body>${el.innerHTML}</body></html>`);
+  doc.close();iframe.onload=()=>{iframe.contentWindow.focus();iframe.contentWindow.print();document.body.removeChild(iframe);};
 }
 
 function CribModal({t,cal,bul,zero,sh,temp,windMs,windDir,pc,tab,bi,isDark,onClose}){
@@ -228,7 +269,6 @@ function App(){
 
       <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"28px 20px 40px"}}>
 
-        {/* HEADER */}
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:28,flexWrap:"wrap",gap:16}}>
           <div>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:11,letterSpacing:".25em",color:cal.color,textTransform:"uppercase",marginBottom:6,opacity:.8}}>◈ {t.subtitle}</div>
@@ -254,18 +294,15 @@ function App(){
           </div>
         </div>
 
-        {/* KALIBER-FLIKAR */}
         <div style={{display:"flex",gap:4,marginBottom:24,flexWrap:"wrap"}}>
           {TABS.map(t2=>(<button key={t2.id} className={`tab-btn${tab===t2.id?" on":""}`} style={{"--cc":CALS[t2.id].color,"--cg":CALS[t2.id].glow}} onClick={()=>switchTab(t2.id)}>{t2.label}</button>))}
         </div>
 
-        {/* KONTROLLPANEL */}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:22}}>
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${cal.color}33`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.zero}</div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{ZEROS.map(z=>(<button key={z} className={`zbtn${zero===z?" on":""}`} style={{"--cc":cal.color,"--cg":cal.glow}} onClick={()=>setZero(z)}>{z} m</button>))}</div>
           </div>
-
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${cal.color}33`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.sightHeight}</div>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -276,7 +313,6 @@ function App(){
             <input type="range" min="1" max="15" step=".5" value={sh} style={{"--pct":`${(sh-1)/14*100}%`,"--rc":cal.color,marginTop:8}} onChange={e=>setSh(parseFloat(e.target.value))}/>
             <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:th.txdd,marginTop:4}}><span>{t.pistolRef}</span><span>{t.scopeRef}</span><span>{t.arRef}</span></div>
           </div>
-
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${temp<0?"rgba(147,197,253,.3)":temp>25?"rgba(251,146,60,.3)":`${cal.color}33`}`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:temp<0?"#93c5fd":temp>25?"#fb923c":cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>
               {t.temp} — {temp}°C{tempDiff!==0&&<span style={{marginLeft:8,fontSize:9,opacity:.6}}>({tempDiff>0?"+":""}{tempDiff}° ISA)</span>}
@@ -292,7 +328,6 @@ function App(){
               <span style={{color:"#fb923c"}}>+40° Sommar</span>
             </div>
           </div>
-
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${th.wbd}`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:windColor,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.wind} — {windMs} m/s</div>
             <input type="range" min="0" max="10" step=".5" value={windMs} style={{"--pct":`${windMs*10}%`,"--rc":windColor}} onChange={e=>setWindMs(parseFloat(e.target.value))}/>
@@ -300,12 +335,10 @@ function App(){
           </div>
         </div>
 
-        {/* KULSELEKTOR */}
         <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
           {cal.bullets.map((b,i)=>(<button key={b.id} className={`pill${bi===i?" on":""}`} style={{"--cc":cal.color,"--cg":cal.glow}} onClick={()=>setBi(i)}>{b.weight} {b.type}</button>))}
         </div>
 
-        {/* INFO-STRIP */}
         <div style={{display:"flex",gap:16,marginBottom:16,padding:"9px 16px",background:`linear-gradient(90deg,${cal.glow} 0%,transparent 65%)`,borderLeft:`3px solid ${cal.color}`,borderRadius:"0 4px 4px 0",flexWrap:"wrap",alignItems:"center"}}>
           <span style={{color:cal.color,fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:13}}>{bul.weight}</span>
           <span style={{color:th.txm,fontSize:12}}>{bul.type}</span>
@@ -318,7 +351,6 @@ function App(){
 
         {!PISTOL_CALS.includes(tab)&&zero<=50&&(<div style={{marginBottom:14,padding:"8px 14px",background:th.obsBg,border:`1px solid ${th.obsBd}`,borderRadius:4,fontSize:11,color:th.obsTx,lineHeight:1.7}}>{t.obsShort(zero)}</div>)}
 
-        {/* HUVUDTABELL */}
         <div className="card" style={{marginBottom:20,overflowX:"auto"}}>
           <table className="dt">
             <thead>
@@ -353,7 +385,6 @@ function App(){
           </table>
         </div>
 
-        {/* LEGEND + NOTER */}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
           <div className="card" style={{padding:"14px 16px"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:th.txd,marginBottom:10}}>{t.colorTitle}</div>
@@ -368,7 +399,6 @@ function App(){
           </div>
         </div>
 
-        {/* MV-TABELL */}
         <div>
           <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".15em",color:th.txd,marginBottom:10,textTransform:"uppercase"}}>◈ {t.mvTitle}</div>
           <div className="card" style={{overflowX:"auto"}}>
@@ -379,7 +409,6 @@ function App(){
           </div>
         </div>
 
-        {/* FOOTER */}
         <div style={{marginTop:28,paddingTop:16,borderTop:`1px solid ${th.bd}`,display:"flex",justifyContent:"space-between",fontSize:10,color:th.txdd,fontFamily:"'Share Tech Mono',monospace",flexWrap:"wrap",gap:8}}>
           <span>{t.footer1}</span><span style={{color:th.txd}}>{t.footer2}</span>
           <span style={{color:th.txdd,opacity:.6}}>v{VERSION}</span>
@@ -390,16 +419,8 @@ function App(){
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-
-<!-- PWA Service Worker -->
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js")
-        .then(r => console.log("SW registered:", r.scope))
-        .catch(e => console.log("SW failed:", e));
-    });
-  }
+  if("serviceWorker"in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").then(r=>console.log("SW:",r.scope)).catch(e=>console.log("SW fail:",e));});}
 </script>
 </body>
 </html>
