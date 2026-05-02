@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bullet Drop Referensguide</title>
+  <title>Bullet Drop Referensguide · tacticaljunkyard.com</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -16,19 +16,21 @@
 <script type="text/babel">
 const {useState,useMemo,useEffect}=React;
 
-const DARK={bg:"#080b10",sf:"rgba(15,23,42,.85)",sf2:"rgba(15,23,42,.6)",bd:"#1e293b",bdl:"#0f172a",tx:"#e2e8f0",txm:"#64748b",txd:"#475569",txdd:"#334155",hov:"rgba(255,255,255,.02)",trk:"#1e293b",wtd:"rgba(56,189,248,.03)",wbd:"rgba(56,189,248,.2)",obsBg:"rgba(251,191,36,.06)",obsBd:"rgba(251,191,36,.2)",obsTx:"#d97706",noteTx:"#64748b",scanOp:.3};
-const LIGHT={bg:"#f8fafc",sf:"rgba(255,255,255,.97)",sf2:"rgba(241,245,249,.9)",bd:"#e2e8f0",bdl:"#f1f5f9",tx:"#0f172a",txm:"#475569",txd:"#64748b",txdd:"#94a3b8",hov:"rgba(0,0,0,.02)",trk:"#e2e8f0",wtd:"rgba(56,189,248,.07)",wbd:"rgba(56,189,248,.35)",obsBg:"rgba(251,191,36,.12)",obsBd:"rgba(180,130,0,.3)",obsTx:"#92400e",noteTx:"#475569",scanOp:.1};
+const DARK={bg:"#080b10",sf:"rgba(15,23,42,.85)",sf2:"rgba(15,23,42,.6)",bd:"#1e293b",bdl:"#0f172a",tx:"#e2e8f0",txm:"#64748b",txd:"#475569",txdd:"#334155",hov:"rgba(255,255,255,.02)",trk:"#1e293b",wtd:"rgba(56,189,248,.03)",wbd:"rgba(56,189,248,.2)",obsBg:"rgba(251,191,36,.06)",obsBd:"rgba(251,191,36,.2)",obsTx:"#d97706",noteTx:"#64748b"};
+const LIGHT={bg:"#f8fafc",sf:"rgba(255,255,255,.97)",sf2:"rgba(241,245,249,.9)",bd:"#e2e8f0",bdl:"#f1f5f9",tx:"#0f172a",txm:"#475569",txd:"#64748b",txdd:"#94a3b8",hov:"rgba(0,0,0,.02)",trk:"#e2e8f0",wtd:"rgba(56,189,248,.07)",wbd:"rgba(56,189,248,.35)",obsBg:"rgba(251,191,36,.12)",obsBd:"rgba(180,130,0,.3)",obsTx:"#92400e",noteTx:"#475569"};
 
 const T={
-  sv:{subtitle:"Taktisk Lathund · Kulfall & Vindavdrift",title:"BULLET DROP",titleSub:"REFERENSGUIDE",atm:"ATMOSFÄR: ISA Standard",atmSub:"TEMP: 15°C · HÖJD: 0 m · G1 BC",calc:"■ NUMERISK INTEGRATION",zero:"Nollning",sightHeight:"Sikthöjd över piplinje",wind:"Vind",barrel:"Pip",drop:"DROP",windCol:"VIND",colorTitle:"FÄRGKODNING",colorDrop:"Kulfall relativt siktlinje",colorWind:"Vindavdrift",noteTitle:"OBSERVERA",notes:["Kulfall beräknat relativt siktlinje med korrekt sikthöjd","Positiv = kulan är ovanför siktlinjen","Negativ = kulan är under siktlinjen","Kort nollning + snabb kaliber → kulan stiger efter nollningspunkten","G1 numerisk integration (dt=0.5ms)","Vindavdrift via lag-regeln · 90°=full · 45°=half","Nollningskolumn markerad med ◉","Validera med din specifika ammunition"],mvTitle:"Utgångshastighet — alla laddningar & piplängder",footer1:"G1 numerisk integration · Siktlinje med sikthöjd · Vindavdrift: lag-regel · ISA 15°C",footer2:"Validera alltid med din specifika ammunition och nollning",pistolRef:"Pistol ~2.5",scopeRef:"Kikkare ~3.8",arRef:"AR-järn ~6.3",windDirs:[{id:"no",label:"0°",factor:0,desc:"Medvind/motvind"},{id:"half",label:"45°",factor:.5,desc:"Half value"},{id:"full",label:"90°",factor:1,desc:"Full value"}],obsShort:(z)=>`◈ Obs: Vid ${z}m-nollning på snabba kaliber stiger kulan över siktlinjen och kan korsa den igen vid längre avstånd. Positivt värde = kulan är ovanför siktlinjen.`,bulletWeight:"Kulvikt",themeLight:"Ljust",themeDark:"Mörkt",themeSystem:"System"},
-  en:{subtitle:"Tactical Reference · Bullet Drop & Wind Drift",title:"BULLET DROP",titleSub:"REFERENCE GUIDE",atm:"ATMOSPHERE: ISA Standard",atmSub:"TEMP: 15°C · ALT: 0 m · G1 BC",calc:"■ NUMERICAL INTEGRATION",zero:"Zero",sightHeight:"Sight height above bore",wind:"Wind",barrel:"Barrel",drop:"DROP",windCol:"WIND",colorTitle:"COLOR CODING",colorDrop:"Bullet drop relative to LOS",colorWind:"Wind drift",noteTitle:"NOTES",notes:["Drop calculated relative to line of sight with correct sight height","Positive = bullet is above line of sight","Negative = bullet is below line of sight","Short zero + fast caliber → bullet rises above LOS after zero point","G1 numerical integration (dt=0.5ms)","Wind drift via lag rule · 90°=full · 45°=half","Zero column marked with ◉","Always verify with your specific ammunition"],mvTitle:"Muzzle Velocity — all loads & barrel lengths",footer1:"G1 numerical integration · LOS with sight height · Wind drift: lag rule · ISA 15°C",footer2:"Always verify with your specific ammunition and zero",pistolRef:"Pistol ~2.5",scopeRef:"Scope ~3.8",arRef:"AR irons ~6.3",windDirs:[{id:"no",label:"0°",factor:0,desc:"Tail/head wind"},{id:"half",label:"45°",factor:.5,desc:"Half value"},{id:"full",label:"90°",factor:1,desc:"Full value"}],obsShort:(z)=>`◈ Note: At ${z}m zero with fast calibers the bullet rises above the line of sight and may cross it again at longer distances. Positive values = bullet is above line of sight.`,bulletWeight:"Bullet weight",themeLight:"Light",themeDark:"Dark",themeSystem:"System"},
+  sv:{subtitle:"Taktisk Lathund · Kulfall & Vindavdrift",title:"BULLET DROP",titleSub:"REFERENSGUIDE",atm:"ATMOSFÄR: ISA Standard",atmSub:"G1 BC · Numerisk integration",calc:"■ BERÄKNAD DATA",zero:"Nollning",sightHeight:"Sikthöjd över piplinje",wind:"Vind",temp:"Temperatur",barrel:"Pip",drop:"DROP",windCol:"VIND",colorTitle:"FÄRGKODNING",colorDrop:"Kulfall relativt siktlinje",colorWind:"Vindavdrift",noteTitle:"OBSERVERA",notes:["Kulfall beräknat relativt siktlinje med korrekt sikthöjd","Positiv = kulan är ovanför siktlinjen","Negativ = kulan är under siktlinjen","Kort nollning + snabb kaliber → kulan stiger efter nollningspunkten","Lufttäthet justeras för temperatur (konstant lufttryck 1013 hPa)","Vindavdrift via lag-regeln · 90°=full · 45°=half","Nollningskolumn markerad med ◉","Validera med din specifika ammunition"],mvTitle:"Utgångshastighet — alla laddningar & piplängder",footer1:"G1 numerisk integration · Siktlinje med sikthöjd · Vindavdrift: lag-regel",footer2:"Validera alltid med din specifika ammunition och nollning",pistolRef:"Pistol ~2.5",scopeRef:"Kikkare ~3.8",arRef:"AR-järn ~6.3",windDirs:[{id:"no",label:"0°",factor:0,desc:"Medvind/motvind"},{id:"half",label:"45°",factor:.5,desc:"Half value"},{id:"full",label:"90°",factor:1,desc:"Full value"}],obsShort:(z)=>`◈ Obs: Vid ${z}m-nollning på snabba kaliber stiger kulan över siktlinjen och kan korsa den igen vid längre avstånd. Positivt värde = kulan är ovanför siktlinjen.`,bulletWeight:"Kulvikt",themeLight:"Ljust",themeDark:"Mörkt",themeSystem:"System",cribCard:"Snabbkort",print:"Skriv ut",close:"Stäng",cribTitle:"SNABBKORT",cribConfig:"Konfiguration",cribDrop:"Kulfall relativt siktlinje (cm)",cribFooter:"Beräknat via G1 numerisk integration · Validera med din specifika ammunition",standardISA:"Standard ISA"},
+  en:{subtitle:"Tactical Reference · Bullet Drop & Wind Drift",title:"BULLET DROP",titleSub:"REFERENCE GUIDE",atm:"ATMOSPHERE: ISA Standard",atmSub:"G1 BC · Numerical integration",calc:"■ CALCULATED DATA",zero:"Zero",sightHeight:"Sight height above bore",wind:"Wind",temp:"Temperature",barrel:"Barrel",drop:"DROP",windCol:"WIND",colorTitle:"COLOR CODING",colorDrop:"Bullet drop relative to LOS",colorWind:"Wind drift",noteTitle:"NOTES",notes:["Drop calculated relative to line of sight with correct sight height","Positive = bullet is above line of sight","Negative = bullet is below line of sight","Short zero + fast caliber → bullet rises above LOS after zero point","Air density adjusted for temperature (constant pressure 1013 hPa)","Wind drift via lag rule · 90°=full · 45°=half","Zero column marked with ◉","Always verify with your specific ammunition"],mvTitle:"Muzzle Velocity — all loads & barrel lengths",footer1:"G1 numerical integration · LOS with sight height · Wind drift: lag rule",footer2:"Always verify with your specific ammunition and zero",pistolRef:"Pistol ~2.5",scopeRef:"Scope ~3.8",arRef:"AR irons ~6.3",windDirs:[{id:"no",label:"0°",factor:0,desc:"Tail/head wind"},{id:"half",label:"45°",factor:.5,desc:"Half value"},{id:"full",label:"90°",factor:1,desc:"Full value"}],obsShort:(z)=>`◈ Note: At ${z}m zero with fast calibers the bullet rises above the line of sight and may cross it again at longer distances. Positive values = bullet is above line of sight.`,bulletWeight:"Bullet weight",themeLight:"Light",themeDark:"Dark",themeSystem:"System",cribCard:"Crib Card",print:"Print",close:"Close",cribTitle:"CRIB CARD",cribConfig:"Configuration",cribDrop:"Bullet drop relative to LOS (cm)",cribFooter:"Calculated via G1 numerical integration · Always verify with your specific ammunition",standardISA:"ISA Standard"},
 };
 
-const SOUND=340,G_ACC=9.81,RHO=1.225;
+const SOUND=340,G_ACC=9.81,RHO_ISA=1.225,T_ISA=288.15;
 const DISP=[25,50,100,150,200,300],ZEROS=[25,50,100,150,200],PISTOL_CALS=["22lr","9x19"];
+function rhoFromTemp(c){return RHO_ISA*(T_ISA/(c+273.15));}
+
 const G1=[[0,.2629],[.05,.2558],[.1,.2487],[.15,.2413],[.2,.2335],[.25,.2259],[.3,.2177],[.35,.2093],[.4,.2006],[.45,.1913],[.5,.182],[.55,.173],[.6,.1684],[.65,.1679],[.7,.17],[.75,.1806],[.8,.1945],[.85,.2155],[.9,.2395],[.95,.2728],[1,.3049],[1.05,.3733],[1.1,.4064],[1.15,.4132],[1.2,.3945],[1.25,.3782],[1.3,.3617],[1.4,.3349],[1.5,.3149],[1.6,.2999],[1.8,.2742],[2,.2547],[2.2,.2407],[2.4,.2297],[2.6,.22],[2.8,.2118],[3,.2048]];
 function getCD(m){if(m<=G1[0][0])return G1[0][1];for(let i=1;i<G1.length;i++){if(m<=G1[i][0]){const f=(m-G1[i-1][0])/(G1[i][0]-G1[i-1][0]);return G1[i-1][1]+f*(G1[i][1]-G1[i-1][1]);}}return G1[G1.length-1][1];}
-function simulate(bc_g1,mv,dists){const bc=bc_g1*703.07,sorted=[...dists].sort((a,b)=>a-b),drops={},tofs={};let x=0,y=0,vx=mv,vy=0,t=0,di=0;const dt=.0005;while(di<sorted.length){while(di<sorted.length&&x>=sorted[di]){drops[sorted[di]]=y*100;tofs[sorted[di]]=t;di++;}if(di>=sorted.length)break;const v=Math.sqrt(vx*vx+vy*vy);if(v<5)break;const ad=RHO*v*v*getCD(v/SOUND)/(2*bc),inv=1/v;vx+=-ad*vx*inv*dt;vy+=(-G_ACC-ad*vy*inv)*dt;x+=vx*dt;y+=vy*dt;t+=dt;}return{drops,tofs};}
+function simulate(bc_g1,mv,dists,rho){const bc=bc_g1*703.07,sorted=[...dists].sort((a,b)=>a-b),drops={},tofs={};let x=0,y=0,vx=mv,vy=0,t=0,di=0;const dt=.0005;while(di<sorted.length){while(di<sorted.length&&x>=sorted[di]){drops[sorted[di]]=y*100;tofs[sorted[di]]=t;di++;}if(di>=sorted.length)break;const v=Math.sqrt(vx*vx+vy*vy);if(v<5)break;const ad=rho*v*v*getCD(v/SOUND)/(2*bc),inv=1/v;vx+=-ad*vx*inv*dt;vy+=(-G_ACC-ad*vy*inv)*dt;x+=vx*dt;y+=vy*dt;t+=dt;}return{drops,tofs};}
 function sdrop(drops,zero,d,sh){if(d===zero)return 0;return Math.round((drops[d]-sh*(1-d/zero)-drops[zero]*(d/zero))*10)/10;}
 function windDrift(tof,dist,mv,w,wf){if(w===0)return 0;return Math.round(w*wf*(tof-dist/mv)*100*10)/10;}
 
@@ -64,7 +66,72 @@ const TABS=[{id:"22lr",label:".22 LR"},{id:"9x19",label:"9×19 mm"},{id:"223rem"
 
 function dcol(v,dark){if(v===0)return dark?"#4ade80":"#16a34a";const a=Math.abs(v);if(a<=5)return dark?"#4ade80":"#16a34a";if(a<=25)return dark?"#facc15":"#ca8a04";if(a<=75)return dark?"#fb923c":"#ea580c";return dark?"#f87171":"#dc2626";}
 function wcol(v,dark){if(v===0)return"#94a3b8";const a=Math.abs(v);if(a<=5)return dark?"#67e8f9":"#0891b2";if(a<=20)return dark?"#38bdf8":"#0369a1";if(a<=50)return dark?"#818cf8":"#6d28d9";return dark?"#c084fc":"#9333ea";}
-function fmt(v){if(v===0)return"±0";return(v>0?"+":"")+v.toFixed(1)+" cm";}
+function fmt(v){if(v===0)return"±0";return(v>0?"+":"")+v.toFixed(1);}
+
+function CribModal({t,cal,bul,zero,sh,temp,windMs,windDir,pc,tab,bi,isDark,onClose}){
+  const wf=(t.windDirs.find(d=>d.id===windDir)||{factor:0}).factor;
+  const bg=isDark?"#0f172a":"#fff";
+  const tx=isDark?"#e2e8f0":"#0f172a";
+  const txd=isDark?"#475569":"#64748b";
+  const bd=isDark?"#1e293b":"#e2e8f0";
+  const rowBd=isDark?"#0f172a":"#f1f5f9";
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.7)",backdropFilter:"blur(4px)"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div id="crib-print-area" style={{background:bg,border:`2px solid ${cal.color}`,borderRadius:8,maxWidth:780,width:"95%",maxHeight:"90vh",overflowY:"auto",padding:"28px 32px",fontFamily:"'Share Tech Mono','Courier New',monospace",color:tx}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,borderBottom:`2px solid ${cal.color}`,paddingBottom:16}}>
+          <div>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".2em",color:cal.color,textTransform:"uppercase",marginBottom:4}}>◈ {t.cribTitle}</div>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:20,fontWeight:900}}>{cal.label}</div>
+            <div style={{fontSize:12,color:txd,marginTop:4}}>{bul.weight} · {bul.type} · BC {bul.bc} G1</div>
+          </div>
+          <div style={{fontSize:11,color:txd,textAlign:"right",lineHeight:1.9}}>
+            <div>{t.zero}: <strong style={{color:cal.color}}>{zero} m</strong></div>
+            <div>{t.sightHeight.split(" ")[0]}: <strong style={{color:cal.color}}>{sh.toFixed(1)} cm</strong></div>
+            <div>{t.temp}: <strong style={{color:cal.color}}>{temp}°C</strong></div>
+            {windMs>0&&<div>{t.wind}: <strong style={{color:cal.color}}>{windMs} m/s · {t.windDirs.find(d=>d.id===windDir)?.label}</strong></div>}
+          </div>
+        </div>
+
+        <div style={{fontSize:11,color:txd,marginBottom:8,textTransform:"uppercase",letterSpacing:".08em"}}>{t.cribDrop}</div>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,marginBottom:16}}>
+          <thead>
+            <tr style={{borderBottom:`1px solid ${bd}`}}>
+              <th style={{textAlign:"left",padding:"6px 8px",fontFamily:"'Orbitron',monospace",fontSize:10,color:txd,textTransform:"uppercase"}}>{t.barrel}</th>
+              <th style={{padding:"6px 8px",fontFamily:"'Orbitron',monospace",fontSize:10,color:txd,textTransform:"uppercase"}}>m/s</th>
+              {DISP.map(d=>(<th key={d} style={{padding:"6px 8px",textAlign:"center",fontFamily:"'Orbitron',monospace",fontSize:10,color:d===zero?"#fff":cal.color,background:d===zero?cal.color+"44":undefined,borderRadius:d===zero?3:0}}>{d}m{d===zero?"◉":""}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {bul.barrels.map((row,ri)=>{
+              const{drops}=pc[tab][bi][ri];
+              return(<tr key={row.len} style={{borderBottom:`1px solid ${rowBd}`}}>
+                <td style={{padding:"7px 8px",fontFamily:"'Orbitron',monospace",fontSize:11,color:txd,fontWeight:700}}>{row.len}</td>
+                <td style={{padding:"7px 8px",textAlign:"center",color:txd}}>{row.mvms}</td>
+                {DISP.map(d=>{const drop=sdrop(drops,zero,d,sh);return(<td key={d} style={{padding:"7px 8px",textAlign:"center",fontWeight:"bold",color:d===zero?(isDark?"#4ade80":"#16a34a"):dcol(drop,isDark),background:d===zero?(isDark?"rgba(74,222,128,.08)":"rgba(22,163,74,.08)"):undefined}}>{d===zero?"±0":fmt(drop)}</td>);})}
+              </tr>);
+            })}
+          </tbody>
+        </table>
+
+        {windMs>0&&(<div style={{marginBottom:16}}>
+          <div style={{fontSize:11,color:txd,marginBottom:8,textTransform:"uppercase",letterSpacing:".08em"}}>{t.windCol} — {windMs} m/s · {t.windDirs.find(d=>d.id===windDir)?.label} (cm)</div>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+            <thead><tr style={{borderBottom:`1px solid ${bd}`}}><th style={{textAlign:"left",padding:"5px 8px",fontFamily:"'Orbitron',monospace",fontSize:10,color:txd,textTransform:"uppercase"}}>{t.barrel}</th>{DISP.map(d=>(<th key={d} style={{padding:"5px 8px",textAlign:"center",fontFamily:"'Orbitron',monospace",fontSize:10,color:isDark?"#38bdf8":"#0369a1"}}>{d}m</th>))}</tr></thead>
+            <tbody>{bul.barrels.map((row,ri)=>{const{tofs}=pc[tab][bi][ri];return(<tr key={row.len} style={{borderBottom:`1px solid ${rowBd}`}}><td style={{padding:"6px 8px",fontFamily:"'Orbitron',monospace",fontSize:11,color:txd,fontWeight:700}}>{row.len}</td>{DISP.map(d=>{const drift=windDrift(tofs[d]||0,d,row.mvms,windMs,wf);return(<td key={d} style={{padding:"6px 8px",textAlign:"center",fontWeight:"bold",color:wcol(drift,isDark)}}>{drift===0?"±0":Math.abs(drift).toFixed(1)}</td>);})}</tr>);})}</tbody>
+          </table>
+        </div>)}
+
+        <div style={{borderTop:`1px solid ${bd}`,paddingTop:12,fontSize:10,color:isDark?"#334155":"#94a3b8",display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:20}}>
+          <span>{t.cribFooter}</span><span>tacticaljunkyard.com</span>
+        </div>
+        <div className="no-print" style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
+          <button onClick={()=>window.print()} style={{background:cal.color,border:"none",color:"#fff",padding:"10px 22px",cursor:"pointer",fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:12,letterSpacing:".08em",borderRadius:4}}>🖨 {t.print}</button>
+          <button onClick={onClose} style={{background:"transparent",border:`1px solid ${isDark?"#334155":"#cbd5e1"}`,color:isDark?"#64748b":"#475569",padding:"10px 22px",cursor:"pointer",fontFamily:"'Orbitron',monospace",fontWeight:700,fontSize:12,letterSpacing:".08em",borderRadius:4}}>{t.close}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App(){
   const [lang,setLang]=useState("sv");
@@ -76,6 +143,8 @@ function App(){
   const [windMs,setWindMs]=useState(0);
   const [windDir,setWindDir]=useState("full");
   const [sh,setSh]=useState(2.5);
+  const [temp,setTemp]=useState(15);
+  const [showCrib,setShowCrib]=useState(false);
 
   useEffect(()=>{const mq=window.matchMedia("(prefers-color-scheme: dark)");const h=e=>setSysDark(e.matches);mq.addEventListener("change",h);return()=>mq.removeEventListener("change",h);},[]);
 
@@ -86,23 +155,27 @@ function App(){
   const bul=cal.bullets[bi];
   const wf=t.windDirs.find(d=>d.id===windDir).factor;
   const showWind=windMs>0;
+  const rho=useMemo(()=>RHO_ISA*(T_ISA/(temp+273.15)),[temp]);
+  const tempDiff=temp-15;
+  const windColor=isDark?"#38bdf8":"#0369a1";
 
-  const pc=useMemo(()=>{const r={};Object.entries(CALS).forEach(([cid,c])=>{r[cid]=c.bullets.map(b=>b.barrels.map(bar=>simulate(b.bc,bar.mvms,DISP)));});return r;},[]);
+  const pc=useMemo(()=>{const r={};Object.entries(CALS).forEach(([cid,c])=>{r[cid]=c.bullets.map(b=>b.barrels.map(bar=>simulate(b.bc,bar.mvms,DISP,rho)));});return r;},[rho]);
 
   function switchTab(id){setTab(id);setBi(0);setZero(PISTOL_CALS.includes(id)?25:100);setSh(PISTOL_CALS.includes(id)?2.5:3.8);}
 
   const THEME_BTNS=[{id:"light",icon:"☀️",label:t.themeLight},{id:"dark",icon:"🌙",label:t.themeDark},{id:"system",icon:"💻",label:t.themeSystem}];
-
   const cssVars={"--bg":th.bg,"--sf":th.sf,"--sf2":th.sf2,"--bd":th.bd,"--bdl":th.bdl,"--tx":th.tx,"--txm":th.txm,"--txd":th.txd,"--txdd":th.txdd,"--hov":th.hov,"--trk":th.trk,"--wtd":th.wtd};
+  const zeroBg=isDark?"rgba(74,222,128,.06)":"rgba(22,163,74,.08)";
+  const zeroCol=isDark?"#4ade80":"#16a34a";
 
   return(
     <div className={isDark?"dark":"light"} style={{...cssVars,minHeight:"100vh",background:th.bg,color:th.tx,fontFamily:"'Share Tech Mono','Courier New',monospace",overflow:"hidden",position:"relative"}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
         .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(var(--gc) 1px,transparent 1px),linear-gradient(90deg,var(--gc) 1px,transparent 1px);background-size:40px 40px}
-        .dark .grid-bg{--gc:rgba(34,211,238,.04)} .light .grid-bg{--gc:rgba(0,0,0,.04)}
+        .dark .grid-bg{--gc:rgba(34,211,238,.04)}.light .grid-bg{--gc:rgba(0,0,0,.04)}
         .scan{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cc,#22d3ee),transparent);animation:scan 8s linear infinite;pointer-events:none;z-index:1}
-        .dark .scan{opacity:.3} .light .scan{opacity:.1}
+        .dark .scan{opacity:.3}.light .scan{opacity:.1}
         @keyframes scan{0%{top:0%}100%{top:100%}}
         .card{background:var(--sf);border:1px solid var(--bd);border-radius:6px}
         .tab-btn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:10px 18px;cursor:pointer;font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:.08em;transition:all .2s}
@@ -110,22 +183,20 @@ function App(){
         .dark .tab-btn.on{color:var(--cc);border-color:var(--cc);background:var(--cg);box-shadow:0 0 14px var(--cg),inset 0 0 14px var(--cg)}
         .light .tab-btn.on{color:var(--cc);border-color:var(--cc);background:var(--cg)}
         .pill{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:7px 14px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;transition:all .15s;border-radius:3px}
-        .pill:hover{color:var(--tx);border-color:var(--txd)}
-        .pill.on{color:var(--cc);border-color:var(--cc);background:var(--cg)}
-        .zbtn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:8px 16px;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;transition:all .15s;border-radius:3px}
+        .pill:hover{color:var(--tx);border-color:var(--txd)}.pill.on{color:var(--cc);border-color:var(--cc);background:var(--cg)}
+        .zbtn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:8px 14px;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;transition:all .15s;border-radius:3px}
         .zbtn:hover{color:var(--tx);border-color:var(--txd)}
         .dark .zbtn.on{color:var(--cc);border-color:var(--cc);background:var(--cg);box-shadow:0 0 10px var(--cg)}
         .light .zbtn.on{color:var(--cc);border-color:var(--cc);background:var(--cg)}
-        .wbtn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:7px 12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;border-radius:3px}
+        .wbtn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:6px 10px;cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;border-radius:3px}
         .wbtn:hover{color:var(--tx);border-color:var(--txd)}
         .dark .wbtn.on{color:#38bdf8;border-color:#38bdf8;background:rgba(56,189,248,.12);box-shadow:0 0 10px rgba(56,189,248,.2)}
         .light .wbtn.on{color:#0369a1;border-color:#0369a1;background:rgba(56,189,248,.12)}
         .dt{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:12px}
         .dt th{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.08em;color:var(--txd);text-transform:uppercase;padding:8px 10px;text-align:center;border-bottom:1px solid var(--bd)}
-        .dark .dt th.wth{color:#38bdf8;opacity:.85} .light .dt th.wth{color:#0369a1;opacity:.9}
+        .dark .dt th.wth{color:#38bdf8;opacity:.85}.light .dt th.wth{color:#0369a1;opacity:.9}
         .dt td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--bdl)}
-        .dt tr:hover td{background:var(--hov)}
-        .wtd{background:var(--wtd)}
+        .dt tr:hover td{background:var(--hov)}.wtd{background:var(--wtd)}
         input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--rc,#38bdf8) var(--pct,0%),var(--trk) var(--pct,0%));outline:none}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--rc,#38bdf8);cursor:pointer}
         .sh-btn{background:transparent;border:1px solid var(--bd);color:var(--txm);width:28px;height:28px;cursor:pointer;font-size:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;font-family:monospace;line-height:1}
@@ -134,10 +205,15 @@ function App(){
         .ctl-btn:hover{color:var(--tx);border-color:var(--txd)}
         .dark .ctl-btn.on{color:#e2e8f0;border-color:#e2e8f0;background:rgba(255,255,255,.08)}
         .light .ctl-btn.on{color:#0f172a;border-color:#0f172a;background:rgba(0,0,0,.07)}
+        .crib-btn{background:transparent;border:1px solid var(--bd);color:var(--txm);padding:8px 16px;cursor:pointer;font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:.08em;border-radius:4px;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+        .crib-btn:hover{color:var(--cc);border-color:var(--cc)}
+        @media print{body>div>*{display:none!important}#crib-print-area{display:block!important;position:fixed!important;inset:0!important;border:none!important;border-radius:0!important;max-height:none!important;overflow:visible!important}.no-print{display:none!important}}
       `}</style>
 
       <div className="grid-bg"/>
       <div className="scan" style={{"--cc":cal.color}}/>
+      {showCrib&&<CribModal t={t} cal={cal} bul={bul} zero={zero} sh={sh} temp={temp} windMs={windMs} windDir={windDir} pc={pc} tab={tab} bi={bi} isDark={isDark} onClose={()=>setShowCrib(false)}/>}
+
       <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"28px 20px 40px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:28,flexWrap:"wrap",gap:16}}>
@@ -156,6 +232,7 @@ function App(){
                 <button className={`ctl-btn${lang==="sv"?" on":""}`} onClick={()=>setLang("sv")}>🇸🇪 SV</button>
                 <button className={`ctl-btn${lang==="en"?" on":""}`} onClick={()=>setLang("en")}>🇬🇧 EN</button>
               </div>
+              <button className="crib-btn" style={{"--cc":cal.color}} onClick={()=>setShowCrib(true)}>🎯 {t.cribCard}</button>
             </div>
             <div style={{fontFamily:"'Share Tech Mono',monospace",fontSize:10,color:th.txdd,textAlign:"right",lineHeight:1.9}}>
               <div style={{color:th.txd}}>{t.atm}</div><div>{t.atmSub}</div>
@@ -168,32 +245,43 @@ function App(){
           {TABS.map(t2=>(<button key={t2.id} className={`tab-btn${tab===t2.id?" on":""}`} style={{"--cc":CALS[t2.id].color,"--cg":CALS[t2.id].glow}} onClick={()=>switchTab(t2.id)}>{t2.label}</button>))}
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:22}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:22}}>
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${cal.color}33`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.zero}</div>
-            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-              {ZEROS.map(z=>(<button key={z} className={`zbtn${zero===z?" on":""}`} style={{"--cc":cal.color,"--cg":cal.glow}} onClick={()=>setZero(z)}>{z} m</button>))}
-            </div>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{ZEROS.map(z=>(<button key={z} className={`zbtn${zero===z?" on":""}`} style={{"--cc":cal.color,"--cg":cal.glow}} onClick={()=>setZero(z)}>{z} m</button>))}</div>
           </div>
+
           <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${cal.color}33`,borderRadius:6}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.sightHeight}</div>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <button className="sh-btn" onClick={()=>setSh(s=>Math.max(1,Math.round((s-.5)*10)/10))}>−</button>
-              <div style={{flex:1,textAlign:"center"}}>
-                <span style={{fontFamily:"'Orbitron',monospace",fontSize:22,fontWeight:700,color:cal.color}}>{sh.toFixed(1)}</span>
-                <span style={{color:th.txd,fontSize:12,marginLeft:4}}>cm</span>
-              </div>
+              <div style={{flex:1,textAlign:"center"}}><span style={{fontFamily:"'Orbitron',monospace",fontSize:22,fontWeight:700,color:cal.color}}>{sh.toFixed(1)}</span><span style={{color:th.txd,fontSize:12,marginLeft:4}}>cm</span></div>
               <button className="sh-btn" onClick={()=>setSh(s=>Math.min(15,Math.round((s+.5)*10)/10))}>+</button>
             </div>
             <input type="range" min="1" max="15" step=".5" value={sh} style={{"--pct":`${(sh-1)/14*100}%`,"--rc":cal.color,marginTop:8}} onChange={e=>setSh(parseFloat(e.target.value))}/>
             <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:th.txdd,marginTop:4}}><span>{t.pistolRef}</span><span>{t.scopeRef}</span><span>{t.arRef}</span></div>
           </div>
-          <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${th.wbd}`,borderRadius:6}}>
-            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:isDark?"#38bdf8":"#0369a1",textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.wind} — {windMs} m/s</div>
-            <input type="range" min="0" max="10" step=".5" value={windMs} style={{"--pct":`${windMs*10}%`,"--rc":isDark?"#38bdf8":"#0369a1"}} onChange={e=>setWindMs(parseFloat(e.target.value))}/>
-            <div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>
-              {t.windDirs.map(d=>(<button key={d.id} className={`wbtn${windDir===d.id?" on":""}`} onClick={()=>setWindDir(d.id)}>{d.label} <span style={{fontSize:9,opacity:.6}}>{d.desc}</span></button>))}
+
+          <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${temp<0?"rgba(147,197,253,.3)":temp>25?"rgba(251,146,60,.3)":`${cal.color}33`}`,borderRadius:6}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:temp<0?"#93c5fd":temp>25?"#fb923c":cal.color,textTransform:"uppercase",marginBottom:10,opacity:.8}}>
+              {t.temp} — {temp}°C{tempDiff!==0&&<span style={{marginLeft:8,fontSize:9,opacity:.6}}>({tempDiff>0?"+":""}{tempDiff}° ISA)</span>}
             </div>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <button className="sh-btn" onClick={()=>setTemp(v=>Math.max(-20,v-5))}>−</button>
+              <div style={{flex:1}}><input type="range" min="-20" max="40" step="1" value={temp} style={{"--pct":`${(temp+20)/60*100}%`,"--rc":temp<0?"#93c5fd":temp>25?"#fb923c":cal.color}} onChange={e=>setTemp(parseInt(e.target.value))}/></div>
+              <button className="sh-btn" onClick={()=>setTemp(v=>Math.min(40,v+5))}>+</button>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:th.txdd,marginTop:6}}>
+              <span style={{color:"#93c5fd"}}>−20° Vinter</span>
+              <span style={{cursor:"pointer",color:temp===15?cal.color:th.txdd,textDecoration:"underline"}} onClick={()=>setTemp(15)}>{t.standardISA} 15°C</span>
+              <span style={{color:"#fb923c"}}>+40° Sommar</span>
+            </div>
+          </div>
+
+          <div style={{padding:"14px 18px",background:th.sf2,border:`1px solid ${th.wbd}`,borderRadius:6}}>
+            <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".12em",color:windColor,textTransform:"uppercase",marginBottom:10,opacity:.8}}>{t.wind} — {windMs} m/s</div>
+            <input type="range" min="0" max="10" step=".5" value={windMs} style={{"--pct":`${windMs*10}%`,"--rc":windColor}} onChange={e=>setWindMs(parseFloat(e.target.value))}/>
+            <div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>{t.windDirs.map(d=>(<button key={d.id} className={`wbtn${windDir===d.id?" on":""}`} onClick={()=>setWindDir(d.id)}>{d.label} <span style={{fontSize:9,opacity:.6}}>{d.desc}</span></button>))}</div>
           </div>
         </div>
 
@@ -207,18 +295,16 @@ function App(){
           <span style={{color:th.txd,fontSize:11}}>BC {bul.bc} G1</span>
           <span style={{color:th.txd,fontSize:11}}>{t.zero}: <span style={{color:cal.color,fontWeight:"bold"}}>{zero} m</span></span>
           <span style={{color:th.txd,fontSize:11}}>{t.sightHeight.split(" ")[0]}: <span style={{color:cal.color,fontWeight:"bold"}}>{sh.toFixed(1)} cm</span></span>
-          {showWind&&<span style={{color:isDark?"#38bdf8":"#0369a1",fontSize:11}}>{t.wind}: <strong>{windMs} m/s</strong> · {t.windDirs.find(d=>d.id===windDir).label}</span>}
+          <span style={{color:temp<0?"#93c5fd":temp>25?"#fb923c":th.txd,fontSize:11}}>{t.temp}: <span style={{fontWeight:"bold"}}>{temp}°C</span></span>
+          {showWind&&<span style={{color:windColor,fontSize:11}}>{t.wind}: <strong>{windMs} m/s</strong> · {t.windDirs.find(d=>d.id===windDir).label}</span>}
         </div>
 
-        {!PISTOL_CALS.includes(tab)&&zero<=50&&(
-          <div style={{marginBottom:14,padding:"8px 14px",background:th.obsBg,border:`1px solid ${th.obsBd}`,borderRadius:4,fontSize:11,color:th.obsTx,lineHeight:1.7}}>{t.obsShort(zero)}</div>
-        )}
+        {!PISTOL_CALS.includes(tab)&&zero<=50&&(<div style={{marginBottom:14,padding:"8px 14px",background:th.obsBg,border:`1px solid ${th.obsBd}`,borderRadius:4,fontSize:11,color:th.obsTx,lineHeight:1.7}}>{t.obsShort(zero)}</div>)}
 
         <div className="card" style={{marginBottom:20,overflowX:"auto"}}>
           <table className="dt">
             <thead>
-              <tr>
-                <th style={{textAlign:"left",paddingLeft:14}}>{t.barrel}</th><th>m/s</th>
+              <tr><th style={{textAlign:"left",paddingLeft:14}}>{t.barrel}</th><th>m/s</th>
                 {DISP.map(d=>(<th key={d} colSpan={showWind?2:1} style={{color:d===zero?th.tx:cal.color,opacity:d===zero?1:.8,fontWeight:d===zero?900:undefined,background:d===zero?th.hov:undefined}}>{d}m{d===zero?" ◉":""}</th>))}
               </tr>
               {showWind&&(<tr><th style={{fontSize:8}}></th><th style={{fontSize:8}}></th>
@@ -227,21 +313,20 @@ function App(){
             </thead>
             <tbody>
               {bul.barrels.map((row,ri)=>{
-                const {drops,tofs}=pc[tab][bi][ri];
+                const{drops,tofs}=pc[tab][bi][ri];
                 return(<tr key={row.len}>
                   <td style={{textAlign:"left",paddingLeft:14,fontFamily:"'Orbitron',monospace",fontSize:11,color:th.txd,fontWeight:700}}>{row.len}</td>
                   <td style={{color:th.txd,fontSize:11}}>{row.mvms}</td>
                   {DISP.map(d=>{
                     const drop=sdrop(drops,zero,d,sh);
                     const drift=windDrift(tofs[d]||0,d,row.mvms,windMs,wf);
-                    const zeroBg=isDark?"rgba(74,222,128,.06)":"rgba(22,163,74,.08)";
                     return showWind?(
                       <React.Fragment key={d}>
-                        <td style={{fontWeight:"bold",color:d===zero?(isDark?"#4ade80":"#16a34a"):dcol(drop,isDark),background:d===zero?zeroBg:undefined}}>{fmt(drop)}</td>
+                        <td style={{fontWeight:"bold",color:d===zero?zeroCol:dcol(drop,isDark),background:d===zero?zeroBg:undefined}}>{d===zero?"±0":fmt(drop)+" cm"}</td>
                         <td className="wtd" style={{fontWeight:"bold",color:wcol(drift,isDark)}}>{drift===0?"±0":Math.abs(drift).toFixed(1)+" cm"}</td>
                       </React.Fragment>
                     ):(
-                      <td key={d} style={{fontWeight:"bold",color:d===zero?(isDark?"#4ade80":"#16a34a"):dcol(drop,isDark),background:d===zero?zeroBg:undefined}}>{fmt(drop)}</td>
+                      <td key={d} style={{fontWeight:"bold",color:d===zero?zeroCol:dcol(drop,isDark),background:d===zero?zeroBg:undefined}}>{d===zero?"±0":fmt(drop)+" cm"}</td>
                     );
                   })}
                 </tr>);
@@ -254,13 +339,9 @@ function App(){
           <div className="card" style={{padding:"14px 16px"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:th.txd,marginBottom:10}}>{t.colorTitle}</div>
             <div style={{fontSize:10,color:th.txd,textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>{t.colorDrop}</div>
-            {(isDark?[{c:"#4ade80",l:"±0 / ≤5 cm"},{c:"#facc15",l:"≤25 cm"},{c:"#fb923c",l:"≤75 cm"},{c:"#f87171",l:">75 cm"}]:[{c:"#16a34a",l:"±0 / ≤5 cm"},{c:"#ca8a04",l:"≤25 cm"},{c:"#ea580c",l:"≤75 cm"},{c:"#dc2626",l:">75 cm"}]).map(({c,l})=>(
-              <div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}><span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/><span style={{color:th.txm}}>{l}</span></div>
-            ))}
+            {(isDark?[{c:"#4ade80",l:"±0/≤5"},{c:"#facc15",l:"≤25"},{c:"#fb923c",l:"≤75"},{c:"#f87171",l:">75"}]:[{c:"#16a34a",l:"±0/≤5"},{c:"#ca8a04",l:"≤25"},{c:"#ea580c",l:"≤75"},{c:"#dc2626",l:">75"}]).map(({c,l})=>(<div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}><span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/><span style={{color:th.txm}}>{l} cm</span></div>))}
             <div style={{fontSize:10,color:th.txd,textTransform:"uppercase",letterSpacing:".06em",marginTop:10,marginBottom:6}}>{t.colorWind}</div>
-            {(isDark?[{c:"#67e8f9",l:"≤5 cm"},{c:"#38bdf8",l:"≤20 cm"},{c:"#818cf8",l:"≤50 cm"},{c:"#c084fc",l:">50 cm"}]:[{c:"#0891b2",l:"≤5 cm"},{c:"#0369a1",l:"≤20 cm"},{c:"#6d28d9",l:"≤50 cm"},{c:"#9333ea",l:">50 cm"}]).map(({c,l})=>(
-              <div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}><span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/><span style={{color:th.txm}}>{l}</span></div>
-            ))}
+            {(isDark?[{c:"#67e8f9",l:"≤5"},{c:"#38bdf8",l:"≤20"},{c:"#818cf8",l:"≤50"},{c:"#c084fc",l:">50"}]:[{c:"#0891b2",l:"≤5"},{c:"#0369a1",l:"≤20"},{c:"#6d28d9",l:"≤50"},{c:"#9333ea",l:">50"}]).map(({c,l})=>(<div key={c} style={{display:"flex",alignItems:"center",marginBottom:5,fontSize:11}}><span style={{display:"inline-block",width:10,height:10,borderRadius:2,background:c,marginRight:6}}/><span style={{color:th.txm}}>{l} cm</span></div>))}
           </div>
           <div style={{background:th.sf2,borderLeft:`3px solid ${cal.color}`,border:`1px solid ${th.bd}`,borderLeftColor:cal.color,padding:"10px 14px",fontSize:11,color:th.noteTx,lineHeight:1.8,borderRadius:"0 4px 4px 0"}}>
             <div style={{fontFamily:"'Orbitron',monospace",fontSize:10,letterSpacing:".1em",color:th.txd,marginBottom:8}}>{t.noteTitle}</div>
