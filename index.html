@@ -62,6 +62,7 @@ const CALS={
     {id:"65cm-c",weight:"147 gr",type:"ELD-M / Hornady",bc:.697,barrels:[{len:'18"',mvms:761},{len:'20"',mvms:776},{len:'22"',mvms:793},{len:'24"',mvms:808}]},
   ]},
 };
+const VERSION="1.1.0";
 const TABS=[{id:"22lr",label:".22 LR"},{id:"9x19",label:"9×19 mm"},{id:"223rem",label:".223 Rem"},{id:"308win",label:".308 Win"},{id:"65cm",label:"6,5 Creed"}];
 
 function dcol(v,dark){if(v===0)return dark?"#4ade80":"#16a34a";const a=Math.abs(v);if(a<=5)return dark?"#4ade80":"#16a34a";if(a<=25)return dark?"#facc15":"#ca8a04";if(a<=75)return dark?"#fb923c":"#ea580c";return dark?"#f87171":"#dc2626";}
@@ -360,7 +361,7 @@ function App(){
         </div>
 
         <div style={{marginTop:28,paddingTop:16,borderTop:`1px solid ${th.bd}`,display:"flex",justifyContent:"space-between",fontSize:10,color:th.txdd,fontFamily:"'Share Tech Mono',monospace",flexWrap:"wrap",gap:8}}>
-          <span>{t.footer1}</span><span style={{color:th.txd}}>{t.footer2}</span>
+          <span>{t.footer1}</span><span style={{color:th.txd}}>{t.footer2}</span><span style={{color:th.txdd,opacity:.6}}>v{VERSION}</span>
         </div>
       </div>
     </div>
