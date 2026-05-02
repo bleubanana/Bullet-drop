@@ -1,0 +1,16 @@
+{
+  "name": "bullet-drop-reference-guide",
+  "version": "1.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Källspårad referensguide för kulfall och vindavdrift.",
+  "scripts": {
+    "clean": "rm -rf assets",
+    "build": "rm -rf assets && tsc && cp src/styles.css assets/styles.css",
+    "test": "npm run build && node tests/run-tests.mjs",
+    "dev": "npm run build && python3 -m http.server 5173"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

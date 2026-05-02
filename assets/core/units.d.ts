@@ -1,0 +1,11 @@
+export declare const FPS_TO_MS = 0.3048;
+export declare const MS_TO_FPS: number;
+export declare const INCH_TO_CM = 2.54;
+export declare const YARD_TO_M = 0.9144;
+export declare function fpsToMs(value: number): number;
+export declare function msToFps(value: number): number;
+export declare function inchToCm(value: number): number;
+export declare function roundTo(value: number, decimals?: number): number;
+export declare function cmToMrad(cm: number, distanceM: number): number;
+export declare function cmToMoa(cm: number, distanceM: number): number;
+export declare function formatSigned(value: number, decimals?: number): string;

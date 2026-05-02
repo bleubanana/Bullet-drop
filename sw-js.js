@@ -1,54 +1,35 @@
-const CACHE = "bulletdrop-v1";
+const CACHE = "bulletdrop-v1.4.0";
+const ASSETS = ["/", "/index.html", "/assets/main.js", "/assets/styles.css", "/manifest.json"];
 
-const ASSETS = [
-  "/",
-  "/index.html",
-  "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
-  "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
-  "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js",
-  "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap"
-];
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
 
-// Installera — cacha alla assets
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
   );
 });
 
-// Aktivera — rensa gamla cachar
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
+self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (url.hostname.includes("google-analytics") || url.hostname.includes("googletagmanager")) return;
 
-// Fetch — cache-first för assets, network-first för allt annat
-self.addEventListener("fetch", e => {
-  // Ignorera icke-GET och analytics
-  if (e.request.method !== "GET") return;
-  if (e.request.url.includes("google-analytics") || e.request.url.includes("gtag")) return;
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request).catch(() => caches.match("/index.html")));
+    return;
+  }
 
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-
-      return fetch(e.request).then(response => {
-        // Cacha bara lyckade responses
-        if (!response || response.status !== 200 || response.type === "error") {
-          return response;
-        }
+  event.respondWith(
+    caches.match(event.request).then(cached => cached ?? fetch(event.request).then(response => {
+      if (response.ok) {
         const clone = response.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return response;
-      }).catch(() => {
-        // Offline fallback — returnera index.html för navigationsrequests
-        if (e.request.mode === "navigate") {
-          return caches.match("/index.html");
-        }
-      });
-    })
+        caches.open(CACHE).then(cache => cache.put(event.request, clone));
+      }
+      return response;
+    }))
   );
 });
