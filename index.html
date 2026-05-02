@@ -26,7 +26,6 @@ const T={
 
 const SOUND=340,G_ACC=9.81,RHO_ISA=1.225,T_ISA=288.15;
 const DISP=[25,50,100,150,200,300],ZEROS=[25,50,100,150,200],PISTOL_CALS=["22lr","9x19"];
-function rhoFromTemp(c){return RHO_ISA*(T_ISA/(c+273.15));}
 
 const G1=[[0,.2629],[.05,.2558],[.1,.2487],[.15,.2413],[.2,.2335],[.25,.2259],[.3,.2177],[.35,.2093],[.4,.2006],[.45,.1913],[.5,.182],[.55,.173],[.6,.1684],[.65,.1679],[.7,.17],[.75,.1806],[.8,.1945],[.85,.2155],[.9,.2395],[.95,.2728],[1,.3049],[1.05,.3733],[1.1,.4064],[1.15,.4132],[1.2,.3945],[1.25,.3782],[1.3,.3617],[1.4,.3349],[1.5,.3149],[1.6,.2999],[1.8,.2742],[2,.2547],[2.2,.2407],[2.4,.2297],[2.6,.22],[2.8,.2118],[3,.2048]];
 function getCD(m){if(m<=G1[0][0])return G1[0][1];for(let i=1;i<G1.length;i++){if(m<=G1[i][0]){const f=(m-G1[i-1][0])/(G1[i][0]-G1[i-1][0]);return G1[i-1][1]+f*(G1[i][1]-G1[i-1][1]);}}return G1[G1.length-1][1];}
@@ -148,6 +147,7 @@ function App(){
   const [showCrib,setShowCrib]=useState(false);
 
   useEffect(()=>{const mq=window.matchMedia("(prefers-color-scheme: dark)");const h=e=>setSysDark(e.matches);mq.addEventListener("change",h);return()=>mq.removeEventListener("change",h);},[]);
+  useEffect(()=>{document.documentElement.lang=lang;},[lang]);
 
   const isDark=themeMode==="dark"||(themeMode==="system"&&sysDark);
   const th=isDark?DARK:LIGHT;
