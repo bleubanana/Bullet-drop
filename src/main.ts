@@ -18,7 +18,7 @@ import {
 } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
 
-const APP_VERSION = "1.4.4";
+const APP_VERSION = "1.4.5";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300] as const;
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200] as const;
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -102,7 +102,11 @@ const I18N = {
     weatherDenied: "Platsåtkomst nekades — manuella värden används.",
     weatherUnavailable: "Platsväder är inte tillgängligt i denna webbläsare.",
     weatherError: "Kunde inte hämta platsväder — manuella värden används.",
-    weatherSource: "Open-Meteo"
+    weatherSource: "Open-Meteo",
+    updateReadyTitle: "Ny version finns",
+    updateReadyText: "Sidan har hämtat en ny version. Ladda om för att använda senaste data och kod.",
+    updateReload: "Ladda om",
+    updateLater: "Senare"
   },
   en: {
     appEyebrow: "SOURCE-TRACKED BALLISTICS",
@@ -182,7 +186,11 @@ const I18N = {
     weatherDenied: "Location access denied — manual values are used.",
     weatherUnavailable: "Local weather is not available in this browser.",
     weatherError: "Could not load local weather — manual values are used.",
-    weatherSource: "Open-Meteo"
+    weatherSource: "Open-Meteo",
+    updateReadyTitle: "New version available",
+    updateReadyText: "The page has downloaded a new version. Reload to use the latest data and code.",
+    updateReload: "Reload",
+    updateLater: "Later"
   }
 } as const;
 
@@ -220,6 +228,7 @@ type State = {
   showAngular: boolean;
   weatherStatus: WeatherStatus;
   weatherMessage: string | null;
+  updateReady: boolean;
 };
 
 type BarrelCalculation = {
@@ -300,7 +309,8 @@ const state: State = {
   windOptionId: "full",
   showAngular: false,
   weatherStatus: "idle",
-  weatherMessage: null
+  weatherMessage: null,
+  updateReady: false
 };
 
 const root = document.getElementById("app");
@@ -552,6 +562,22 @@ function dataQualitySummary(load: AmmunitionLoad): { score: number; label: strin
   if (average >= 2.5) return { score: average, label: t("medium"), detail: t("mediumDetail") };
   if (average >= 1.8) return { score: average, label: t("limited"), detail: t("limitedDetail") };
   return { score: average, label: t("low"), detail: t("lowDetail") };
+}
+
+function renderUpdateBanner(): string {
+  if (!state.updateReady) return "";
+  return `
+    <div class="update-banner" role="status" aria-live="polite">
+      <div>
+        <strong>${t("updateReadyTitle")}</strong>
+        <span>${t("updateReadyText")}</span>
+      </div>
+      <div class="update-actions">
+        <button id="updateReloadButton" class="accent-button">${t("updateReload")}</button>
+        <button id="updateLaterButton" class="ghost-button">${t("updateLater")}</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderPreferenceBar(): string {
@@ -879,6 +905,7 @@ function render(): void {
 
   appRoot.innerHTML = `
     <div class="shell" style="--accent:${caliber.color};--glow:${caliber.glow}">
+      ${renderUpdateBanner()}
       ${renderPreferenceBar()}
       <header class="hero">
         <div class="hero-copy">
@@ -966,6 +993,9 @@ function render(): void {
 }
 
 function bindEvents(): void {
+  document.getElementById("updateReloadButton")?.addEventListener("click", () => activateWaitingServiceWorkerAndReload());
+  document.getElementById("updateLaterButton")?.addEventListener("click", () => setState({ updateReady: false }));
+
   document.querySelectorAll<HTMLButtonElement>("[data-language]").forEach(button => {
     button.addEventListener("click", () => setState({ language: (button.dataset.language as Language | undefined) ?? state.language }));
   });
@@ -1086,6 +1116,62 @@ async function fetchLocalWeather(position: GeolocationPosition, requestId: numbe
   }
 }
 
+let pendingServiceWorker: ServiceWorker | null = null;
+let reloadAfterServiceWorkerUpdate = false;
+
+function activateWaitingServiceWorkerAndReload(): void {
+  reloadAfterServiceWorkerUpdate = true;
+  safeSetStorage("lastReloadedAppVersion", APP_VERSION);
+  if (pendingServiceWorker) {
+    pendingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+    window.setTimeout(() => window.location.reload(), 1500);
+    return;
+  }
+  window.location.reload();
+}
+
+function handleServiceWorkerRegistration(registration: ServiceWorkerRegistration): void {
+  if (registration.waiting && navigator.serviceWorker.controller) {
+    pendingServiceWorker = registration.waiting;
+    setState({ updateReady: true });
+  }
+
+  registration.addEventListener("updatefound", () => {
+    const newWorker = registration.installing;
+    if (!newWorker) return;
+    newWorker.addEventListener("statechange", () => {
+      if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+        pendingServiceWorker = newWorker;
+        setState({ updateReady: true });
+      }
+    });
+  });
+
+  window.setInterval(() => {
+    void registration.update().catch(error => console.warn("Service worker update check failed", error));
+  }, 60 * 60 * 1000);
+}
+
+function registerServiceWorker(): void {
+  if (!("serviceWorker" in navigator)) return;
+
+  let controllerChangeReloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!reloadAfterServiceWorkerUpdate || controllerChangeReloaded) return;
+    controllerChangeReloaded = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.register("./sw-js.js")
+    .then(registration => {
+      handleServiceWorkerRegistration(registration);
+      return registration.update();
+    })
+    .catch(error => {
+      console.warn("Service worker registration failed", error);
+    });
+}
+
 function renderFatalError(error: unknown): void {
   console.error("Bullet Drop failed to start", error);
   const message = error instanceof Error ? error.message : String(error);
@@ -1108,11 +1194,7 @@ try {
 
   window.addEventListener("load", () => {
     requestLocalWeather();
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw-js.js").catch(error => {
-        console.warn("Service worker registration failed", error);
-      });
-    }
+    registerServiceWorker();
   });
 } catch (error) {
   renderFatalError(error);

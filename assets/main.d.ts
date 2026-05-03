@@ -80,6 +80,10 @@ declare const I18N: {
         readonly weatherUnavailable: "Platsväder är inte tillgängligt i denna webbläsare.";
         readonly weatherError: "Kunde inte hämta platsväder — manuella värden används.";
         readonly weatherSource: "Open-Meteo";
+        readonly updateReadyTitle: "Ny version finns";
+        readonly updateReadyText: "Sidan har hämtat en ny version. Ladda om för att använda senaste data och kod.";
+        readonly updateReload: "Ladda om";
+        readonly updateLater: "Senare";
     };
     readonly en: {
         readonly appEyebrow: "SOURCE-TRACKED BALLISTICS";
@@ -160,6 +164,10 @@ declare const I18N: {
         readonly weatherUnavailable: "Local weather is not available in this browser.";
         readonly weatherError: "Could not load local weather — manual values are used.";
         readonly weatherSource: "Open-Meteo";
+        readonly updateReadyTitle: "New version available";
+        readonly updateReadyText: "The page has downloaded a new version. Reload to use the latest data and code.";
+        readonly updateReload: "Reload";
+        readonly updateLater: "Later";
     };
 };
 type Language = keyof typeof I18N;
@@ -183,13 +191,14 @@ type State = {
     showAngular: boolean;
     weatherStatus: WeatherStatus;
     weatherMessage: string | null;
+    updateReady: boolean;
 };
 type BarrelCalculation = {
     barrel: BarrelVelocityPoint;
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.4";
+export declare const __appVersion = "1.4.5";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;

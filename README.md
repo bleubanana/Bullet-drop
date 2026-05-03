@@ -2,7 +2,7 @@
 
 Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 
-## Vad som ändrats i v1.4.4
+## Vad som ändrats i v1.4.5
 
 - Ballistikmotorn är separerad från UI:t.
 - Ammunitionsdata ligger i en källspårad datamodell.

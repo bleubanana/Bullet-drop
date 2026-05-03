@@ -33,3 +33,9 @@ npm test
 ```
 
 Committa sedan både `src/` och `assets/`.
+
+## v1.4.5 cache/update handling
+
+Added service-worker update detection with an in-app reload banner. When a new service worker has installed and is waiting, the app shows "Ny version finns / New version available". Selecting reload sends `SKIP_WAITING` to the waiting worker and reloads after `controllerchange`, so users do not remain on stale cached assets after future releases.
+
+The app also calls `registration.update()` on load and then once per hour while open. Open-Meteo responses are still excluded from service-worker caching.

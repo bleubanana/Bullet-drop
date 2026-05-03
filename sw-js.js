@@ -1,8 +1,15 @@
-const CACHE = "bulletdrop-v1.4.4";
+const CACHE = "bulletdrop-v1.4.5";
 const SCOPE = self.registration.scope;
 const ASSETS = ["./", "./index.html", "./assets/main.js", "./assets/styles.css", "./manifest.json"]
   .map(path => new URL(path, SCOPE).toString());
 const INDEX_URL = new URL("./index.html", SCOPE).toString();
+
+
+self.addEventListener("message", event => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener("install", event => {
   event.waitUntil(

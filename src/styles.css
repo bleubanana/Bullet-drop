@@ -727,3 +727,50 @@ button:disabled {
   cursor: wait;
   transform: none !important;
 }
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent, #38bdf8) 45%, var(--border));
+  border-radius: 18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent, #38bdf8) 12%, var(--surface)), var(--surface-2));
+  box-shadow: 0 14px 42px var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.update-banner strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--accent, #38bdf8);
+  font-family: "Orbitron", "Share Tech Mono", monospace;
+  font-size: .86rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.update-banner span {
+  color: var(--text-muted);
+  font-size: .88rem;
+}
+
+.update-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .update-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .update-actions {
+    width: 100%;
+  }
+  .update-actions button {
+    flex: 1;
+  }
+}
