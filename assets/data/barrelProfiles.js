@@ -1,13 +1,13 @@
 export const BARREL_PROFILES = [
     {
         loadId: "cci-standard-velocity-35",
-        notes: "Derived from manufacturer nominal MV and previous v1.3.1 profile; verify with chronograph for a specific rifle.",
+        notes: "Derived from manufacturer nominal MV and .22 LR barrel-length context; verify with chronograph for a specific rifle.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 919, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 6, velocityFps: 1001, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 1053, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 1050, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 1040, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] }
+            { barrelLengthIn: 4, velocityFps: 919, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 6, velocityFps: 1001, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1053, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1050, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1040, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] }
         ]
     },
     {
@@ -22,63 +22,93 @@ export const BARREL_PROFILES = [
     },
     {
         loadId: "cci-mini-mag-hp-31",
-        notes: "Piplängdsprofilen är en dokumenterad uppskattning; nominal MV är manufacturer-published.",
+        notes: "Derived from manufacturer nominal MV and .22 LR barrel-length behavior. Needs exact CCI Mini-Mag HP chronograph mapping.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 1165, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 6, velocityFps: 1230, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 1289, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 1283, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 1266, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog", "legacy-v131"] }
+            { barrelLengthIn: 4, velocityFps: 1165, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 6, velocityFps: 1230, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1289, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1283, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1266, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "derived-barrel-note"] }
         ]
     },
     {
-        loadId: "cci-sub-sonic-shp-74",
+        loadId: "cci-sub-sonic-hp-56",
         notes: "Specific CCI subsonic load replacing the old generic Eley/SK/CCI row. Barrel values are derived around the 1050 fps manufacturer MV.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 940, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog"] },
-            { barrelLengthIn: 6, velocityFps: 980, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog"] },
-            { barrelLengthIn: 16, velocityFps: 1050, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-2025-catalog"] },
-            { barrelLengthIn: 18, velocityFps: 1045, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog"] },
-            { barrelLengthIn: 20, velocityFps: 1040, confidence: "derived", method: "derived", sourceRefs: ["cci-2025-catalog"] }
+            { barrelLengthIn: 4, velocityFps: 940, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 6, velocityFps: 980, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1050, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart"] },
+            { barrelLengthIn: 18, velocityFps: 1045, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1040, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-older-ballistic-chart", "derived-barrel-note"] }
         ]
     },
     {
         loadId: "federal-9mm-115-jhp-bbti",
+        notes: "Measured BBTI row. 13–18 inch values are retained as measured; they show a local peak and a drop at 18 inches rather than a monotonic PCC curve.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 1094, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 8, velocityFps: 1234, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 10, velocityFps: 1253, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 16, velocityFps: 1295, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 18, velocityFps: 1297, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] }
+            { barrelLengthIn: 4, velocityFps: 1094, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling", "federal-9bp-le"] },
+            { barrelLengthIn: 8, velocityFps: 1234, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 10, velocityFps: 1253, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 13, velocityFps: 1281, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 14, velocityFps: 1295, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 15, velocityFps: 1304, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 16, velocityFps: 1295, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 17, velocityFps: 1320, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 18, velocityFps: 1297, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] }
         ]
     },
     {
         loadId: "federal-9mm-124-hydrashok-bbti",
+        notes: "Measured BBTI row. The 18 inch value is lower than the 14–17 inch plateau, matching the source table.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 1061, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 8, velocityFps: 1180, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 10, velocityFps: 1211, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 16, velocityFps: 1243, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 18, velocityFps: 1231, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] }
+            { barrelLengthIn: 4, velocityFps: 1061, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling", "federal-p9hs1g1-le"] },
+            { barrelLengthIn: 8, velocityFps: 1180, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 10, velocityFps: 1211, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 13, velocityFps: 1237, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 14, velocityFps: 1241, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 15, velocityFps: 1244, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 16, velocityFps: 1243, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 17, velocityFps: 1250, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 18, velocityFps: 1231, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] }
         ]
     },
     {
         loadId: "federal-9mm-147-hydrashok-bbti",
+        notes: "Measured BBTI row. 13, 16, 17 and 18 inch rows are retained to expose non-monotonic long-barrel behavior.",
         points: [
-            { barrelLengthIn: 4, velocityFps: 951, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 8, velocityFps: 1047, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 10, velocityFps: 1067, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 16, velocityFps: 1073, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] },
-            { barrelLengthIn: 18, velocityFps: 1083, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm"] }
+            { barrelLengthIn: 4, velocityFps: 951, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling", "federal-p9hst2-le", "federal-9ms-le"] },
+            { barrelLengthIn: 8, velocityFps: 1047, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 10, velocityFps: 1067, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 13, velocityFps: 1081, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 14, velocityFps: 1090, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 15, velocityFps: 1090, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 16, velocityFps: 1073, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 17, velocityFps: 1096, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 18, velocityFps: 1083, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] }
+        ]
+    },
+    {
+        loadId: "speer-9mm-124-gold-dot-sb-bbti",
+        notes: "Measured BBTI row for Speer 124 gr Gold Dot Short Barrel. The source table has a plateau/variation from 13 to 18 inches; the values are not smoothed.",
+        points: [
+            { barrelLengthIn: 4, velocityFps: 1203, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling", "vista-speer-gold-dot-short-barrel-124"] },
+            { barrelLengthIn: 8, velocityFps: 1329, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 10, velocityFps: 1338, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 13, velocityFps: 1378, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 14, velocityFps: 1390, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 15, velocityFps: 1375, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 16, velocityFps: 1379, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 17, velocityFps: 1400, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] },
+            { barrelLengthIn: 18, velocityFps: 1395, confidence: "measured-third-party", method: "measured", sourceRefs: ["bbti-9mm", "bbti-9mm-rifling"] }
         ]
     },
     {
         loadId: "federal-xm193-55-fmj-ref",
-        notes: "5.56 reference values; 14.5 inch row is interpolated between 14 and 16.5 inch source rows.",
+        notes: "5.56 reference values; 14.5 inch row is interpolated between source rows.",
         points: [
             { barrelLengthIn: 8, velocityFps: 2520, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 11, velocityFps: 2834, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
-            { barrelLengthIn: 14.5, velocityFps: 3069, confidence: "derived", method: "interpolated", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
+            { barrelLengthIn: 14.5, velocityFps: 3069, confidence: "derived", method: "interpolated", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556", "derived-barrel-note"] },
             { barrelLengthIn: 16.5, velocityFps: 3187, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 18, velocityFps: 3202, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 20, velocityFps: 3306, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] }
@@ -90,75 +120,82 @@ export const BARREL_PROFILES = [
         points: [
             { barrelLengthIn: 8, velocityFps: 2296, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 11, velocityFps: 2579, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
-            { barrelLengthIn: 14.5, velocityFps: 2845, confidence: "derived", method: "interpolated", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
+            { barrelLengthIn: 14.5, velocityFps: 2845, confidence: "derived", method: "interpolated", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556", "derived-barrel-note"] },
             { barrelLengthIn: 16.5, velocityFps: 2992, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 18, velocityFps: 3052, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] },
             { barrelLengthIn: 20, velocityFps: 3097, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-223-cutdown", "firearmwiki-556"] }
         ]
     },
     {
-        loadId: "sierra-77-smk-otm-legacy",
+        loadId: "federal-gm223m3-77-smk-ref",
+        notes: "Derived from Federal GM223M3 24 inch published velocity and .223/5.56 barrel-length context. Product MV/BC are manufacturer-published; barrel profile is not yet product-measured.",
         points: [
-            { barrelLengthIn: 8, velocityFps: 2349, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 11, velocityFps: 2500, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 14.5, velocityFps: 2651, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 2749, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 2799, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2851, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] }
+            { barrelLengthIn: 8, velocityFps: 2260, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 11, velocityFps: 2385, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 14.5, velocityFps: 2480, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 2520, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 2570, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2620, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-223-cutdown", "derived-barrel-note"] }
         ]
     },
     {
-        loadId: "generic-308-147-m80-legacy",
+        loadId: "winchester-308-147-fmj-cutdown-ref",
+        notes: "RifleShooter summary table for Winchester 147 FMJ. 13.5 inch row is extrapolated below the measured 16.5 inch row.",
         points: [
-            { barrelLengthIn: 13.5, velocityFps: 2559, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 2612, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 2654, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2697, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] }
+            { barrelLengthIn: 13.5, velocityFps: 2608, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 16.5, velocityFps: 2682, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-summary"] },
+            { barrelLengthIn: 18, velocityFps: 2739, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-summary"] },
+            { barrelLengthIn: 20, velocityFps: 2804, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-summary"] }
         ]
     },
     {
         loadId: "federal-gm308m-168-smk-ref",
+        notes: "Federal GM308M cartridge-specific RifleShooter cut-down test. 13.5 inch row is extrapolated below source range.",
         points: [
-            { barrelLengthIn: 13.5, velocityFps: 2464, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-168-gm", "legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 2513, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-168-gm", "legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 2556, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-168-gm", "legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2598, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-168-gm", "legacy-v131"] }
+            { barrelLengthIn: 13.5, velocityFps: 2403, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-308-168-gm", "derived-barrel-note"] },
+            { barrelLengthIn: 16.5, velocityFps: 2466, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-168-gm"] },
+            { barrelLengthIn: 18, velocityFps: 2523, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-168-gm"] },
+            { barrelLengthIn: 20, velocityFps: 2565, confidence: "measured-third-party", method: "measured", sourceRefs: ["rifleshooter-308-168-gm"] }
         ]
     },
     {
-        loadId: "generic-308-175-smk-legacy",
+        loadId: "federal-gm308m2-175-smk-ref",
+        notes: "Derived from Federal GM308M2 24 inch manufacturer MV and RifleShooter .308 loss-rate context. Replace with a 175 gr cut-down source when mapped.",
         points: [
-            { barrelLengthIn: 13.5, velocityFps: 2418, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 16, velocityFps: 2474, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 18, velocityFps: 2516, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2562, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] }
+            { barrelLengthIn: 13.5, velocityFps: 2381, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 16.5, velocityFps: 2444, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 2475, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2516, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 24, velocityFps: 2600, confidence: "manufacturer-published", method: "published", sourceRefs: ["federal-2025-catalog"] }
         ]
     },
     {
-        loadId: "generic-65cm-123-eldm-legacy",
+        loadId: "generic-65cm-123-eldm-estimate",
+        notes: "Class-level 123 gr 6.5 CM reference retained pending exact factory product mapping.",
         points: [
-            { barrelLengthIn: 18, velocityFps: 2772, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2818, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 22, velocityFps: 2861, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] },
-            { barrelLengthIn: 24, velocityFps: 2907, confidence: "legacy-estimate", method: "legacy", sourceRefs: ["legacy-v131"] }
+            { barrelLengthIn: 18, velocityFps: 2772, confidence: "derived", method: "derived", sourceRefs: ["waffenlager-65cm-bullet-table", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2818, confidence: "derived", method: "derived", sourceRefs: ["waffenlager-65cm-bullet-table", "derived-barrel-note"] },
+            { barrelLengthIn: 22, velocityFps: 2861, confidence: "derived", method: "derived", sourceRefs: ["waffenlager-65cm-bullet-table", "derived-barrel-note"] },
+            { barrelLengthIn: 24, velocityFps: 2907, confidence: "derived", method: "derived", sourceRefs: ["waffenlager-65cm-bullet-table", "derived-barrel-note"] }
         ]
     },
     {
-        loadId: "hornady-65cm-140-american-gunner-ref",
+        loadId: "federal-gm65crd1-140-smk-ref",
+        notes: "Derived from Federal GM65CRD1 24 inch manufacturer MV using 6.5 Creedmoor barrel-length context.",
         points: [
-            { barrelLengthIn: 18, velocityFps: 2516, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-65cm-2019", "legacy-v131"] },
-            { barrelLengthIn: 20, velocityFps: 2562, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-65cm-2019", "legacy-v131"] },
-            { barrelLengthIn: 22, velocityFps: 2605, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-65cm-2019", "legacy-v131"] },
-            { barrelLengthIn: 24, velocityFps: 2651, confidence: "derived", method: "derived", sourceRefs: ["rifleshooter-65cm-2019", "legacy-v131"] }
+            { barrelLengthIn: 18, velocityFps: 2516, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2569, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 22, velocityFps: 2622, confidence: "derived", method: "derived", sourceRefs: ["federal-2025-catalog", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 24, velocityFps: 2675, confidence: "manufacturer-published", method: "published", sourceRefs: ["federal-2025-catalog"] }
         ]
     },
     {
         loadId: "hornady-65cm-147-eldm-tap-81505",
         notes: "Derived from Hornady 2655 fps nominal data and RifleShooter's 6.5 CM cut-down context.",
         points: [
-            { barrelLengthIn: 18, velocityFps: 2499, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019"] },
-            { barrelLengthIn: 20, velocityFps: 2551, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019"] },
-            { barrelLengthIn: 22, velocityFps: 2603, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019"] },
+            { barrelLengthIn: 18, velocityFps: 2499, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2551, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 22, velocityFps: 2603, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019", "derived-barrel-note"] },
             { barrelLengthIn: 24, velocityFps: 2655, confidence: "manufacturer-published", method: "published", sourceRefs: ["hornady-65cm-147-tap"] }
         ]
     }

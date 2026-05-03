@@ -2,15 +2,164 @@ import { calculateAtmosphere } from "./core/atmosphere.js";
 import { calculateTrajectory } from "./core/trajectory.js";
 import { fpsToMs, formatSigned, msToFps, roundTo } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.4.1";
 const DISTANCES_M = [25, 50, 100, 150, 200, 300];
 const ZERO_OPTIONS_M = [25, 50, 100, 150, 200];
+const I18N = {
+    sv: {
+        appEyebrow: "KÄLLSPÅRAD BALLISTIK",
+        title: "BULLET DROP",
+        titleSub: "REFERENSGUIDE",
+        subtitle: "Kulfall & vindavdrift med explicit datakvalitet, källor och osäkerhetsklassning.",
+        atmosphere: "ATMOSFÄR",
+        language: "Språk",
+        theme: "Tema",
+        light: "Ljust",
+        dark: "Mörkt",
+        system: "System",
+        load: "Laddning",
+        zero: "Nollning",
+        sightHeight: "Sikthöjd över pipa",
+        sightPresets: "Snabbval sikthöjd",
+        pistol: "Pistol",
+        scope: "Kikare",
+        arIrons: "AR-järn",
+        temperature: "Temperatur",
+        pressure: "Lufttryck",
+        wind: "Vind",
+        windAngle: "Vindvinkel",
+        calculatedData: "■ BERÄKNAD DATA",
+        calculatedHelp: "Kulfall relativt siktlinje. Nollningskolumnen markeras med ◉.",
+        showCm: "Visa cm",
+        showMrad: "Visa MRAD",
+        barrel: "Pipa",
+        source: "Källa",
+        windDrift: "■ VINDAVDRIFT",
+        windHelpPrefix: "Approximation via lag-regel",
+        selected: "VALD RAD",
+        showSources: "Visa källor",
+        dataQuality: "Datakvalitet",
+        nominalMv: "Nominal MV",
+        bc: "BC",
+        barrelData: "Pipdata",
+        publishedMeasured: "publicerad/mätt",
+        sourcesForLoad: "Källor för vald laddning",
+        comments: "Kommentarer",
+        muzzleVelocity: "Utgångshastighet — vald laddning",
+        mvHelp: "Varje rad visar metod och källklassning.",
+        cribCard: "SNABBKORT",
+        print: "Skriv ut",
+        notes: "OBSERVERA",
+        sourceCatalog: "Källkatalog",
+        catalogText: "källposter finns i datamodellen. Endast relevanta källor för vald laddning visas öppet ovan.",
+        footerLeft: "G1 numerisk integration · spårbar data",
+        footerRight: "tacticaljunkyard.com",
+        note1: "Kulfall beräknas relativt siktlinje med sikthöjd och vald nollning.",
+        note2: "G1-drag använder numerisk integration; vind är separat approximation via lag-regel.",
+        note3: "Temperatur påverkar både lufttäthet och ljudhastighet/Mach.",
+        note4: "Alla piplängdsvärden ska verifieras med din ammunition, ditt vapen och din nollning.",
+        high: "Hög",
+        medium: "Medel",
+        limited: "Begränsad",
+        low: "Låg",
+        highDetail: "Majoriteten av kritiska värden har tillverkar- eller mätt källa.",
+        mediumDetail: "Blandning av mätta, publicerade och härledda värden.",
+        limitedDetail: "Flera viktiga värden är härledda och bör verifieras.",
+        lowDetail: "Estimat dominerar; använd främst som struktur/referens.",
+        manufacturer: "Tillverkare",
+        measured: "Mätt 3:e part",
+        derived: "Härledd",
+        estimate: "Estimat",
+        noWind: "Medvind/motvind",
+        halfWind: "Half value",
+        fullWind: "Full value"
+    },
+    en: {
+        appEyebrow: "SOURCE-TRACKED BALLISTICS",
+        title: "BULLET DROP",
+        titleSub: "REFERENCE GUIDE",
+        subtitle: "Bullet drop and wind drift with explicit data quality, sources and uncertainty classification.",
+        atmosphere: "ATMOSPHERE",
+        language: "Language",
+        theme: "Theme",
+        light: "Light",
+        dark: "Dark",
+        system: "System",
+        load: "Load",
+        zero: "Zero",
+        sightHeight: "Sight height above bore",
+        sightPresets: "Sight height presets",
+        pistol: "Pistol",
+        scope: "Scope",
+        arIrons: "AR irons",
+        temperature: "Temperature",
+        pressure: "Pressure",
+        wind: "Wind",
+        windAngle: "Wind angle",
+        calculatedData: "■ CALCULATED DATA",
+        calculatedHelp: "Drop relative to line of sight. The zero column is marked with ◉.",
+        showCm: "Show cm",
+        showMrad: "Show MRAD",
+        barrel: "Barrel",
+        source: "Source",
+        windDrift: "■ WIND DRIFT",
+        windHelpPrefix: "Lag-rule approximation",
+        selected: "SELECTED ROW",
+        showSources: "Show sources",
+        dataQuality: "Data quality",
+        nominalMv: "Nominal MV",
+        bc: "BC",
+        barrelData: "Barrel data",
+        publishedMeasured: "published/measured",
+        sourcesForLoad: "Sources for selected load",
+        comments: "Comments",
+        muzzleVelocity: "Muzzle velocity — selected load",
+        mvHelp: "Each row shows method and source confidence.",
+        cribCard: "CRIB CARD",
+        print: "Print",
+        notes: "NOTES",
+        sourceCatalog: "Source catalog",
+        catalogText: "source records exist in the data model. Only selected-load sources are expanded above.",
+        footerLeft: "G1 numerical integration · traceable data",
+        footerRight: "tacticaljunkyard.com",
+        note1: "Drop is calculated relative to line of sight with sight height and selected zero.",
+        note2: "G1 drag uses numerical integration; wind is a separate lag-rule approximation.",
+        note3: "Temperature affects both air density and speed of sound/Mach.",
+        note4: "Always verify barrel-length values with your ammunition, firearm and zero.",
+        high: "High",
+        medium: "Medium",
+        limited: "Limited",
+        low: "Low",
+        highDetail: "Most critical values have manufacturer or measured sources.",
+        mediumDetail: "Mixed measured, published and derived values.",
+        limitedDetail: "Several important values are derived and should be verified.",
+        lowDetail: "Estimates dominate; use primarily as structure/reference.",
+        manufacturer: "Manufacturer",
+        measured: "Measured 3rd party",
+        derived: "Derived",
+        estimate: "Estimate",
+        noWind: "Tail/head wind",
+        halfWind: "Half value",
+        fullWind: "Full value"
+    }
+};
 const WIND_OPTIONS = [
-    { id: "no", label: "0°", factor: 0, desc: "Medvind/motvind" },
-    { id: "half", label: "45°", factor: 0.5, desc: "Half value" },
-    { id: "full", label: "90°", factor: 1, desc: "Full value" }
+    { id: "no", label: "0°", factor: 0, descKey: "noWind" },
+    { id: "half", label: "45°", factor: 0.5, descKey: "halfWind" },
+    { id: "full", label: "90°", factor: 1, descKey: "fullWind" }
 ];
+function readLanguage() {
+    const stored = localStorage.getItem("language");
+    return stored === "en" || stored === "sv" ? stored : "sv";
+}
+function readThemeMode() {
+    const stored = localStorage.getItem("themeMode");
+    return stored === "light" || stored === "dark" || stored === "system" ? stored : "dark";
+}
 const state = {
+    language: readLanguage(),
+    themeMode: readThemeMode(),
+    systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
     caliberId: "22lr",
     loadId: "cci-standard-velocity-35",
     zeroM: 25,
@@ -25,13 +174,35 @@ const root = document.getElementById("app");
 if (!root)
     throw new Error("Missing #app element");
 const appRoot = root;
+const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+mediaQuery.addEventListener("change", event => {
+    state.systemDark = event.matches;
+    applyPreferences();
+});
+function t(key) {
+    return I18N[state.language][key];
+}
 function setState(patch) {
     Object.assign(state, patch);
     const loads = ammunitionForCaliber(state.caliberId);
     if (!loads.some(load => load.id === state.loadId)) {
         state.loadId = loads[0]?.id ?? AMMUNITION[0]?.id ?? "";
     }
+    localStorage.setItem("language", state.language);
+    localStorage.setItem("themeMode", state.themeMode);
+    applyPreferences();
     render();
+}
+function isDarkTheme() {
+    return state.themeMode === "dark" || (state.themeMode === "system" && state.systemDark);
+}
+function applyPreferences() {
+    const dark = isDarkTheme();
+    document.documentElement.lang = state.language;
+    document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    document.body.classList.toggle("theme-light", !dark);
+    document.body.classList.toggle("theme-dark", dark);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#080b10" : "#f8fafc");
 }
 function escapeHtml(value) {
     return value
@@ -43,10 +214,10 @@ function escapeHtml(value) {
 }
 function confidenceLabel(level) {
     switch (level) {
-        case "manufacturer-published": return "Tillverkare";
-        case "measured-third-party": return "Mätt 3:e part";
-        case "derived": return "Härledd";
-        case "legacy-estimate": return "Legacy/estimat";
+        case "manufacturer-published": return t("manufacturer");
+        case "measured-third-party": return t("measured");
+        case "derived": return t("derived");
+        case "legacy-estimate": return t("estimate");
     }
 }
 function confidenceScore(level) {
@@ -85,7 +256,7 @@ function driftClass(value) {
     return "wind-purple";
 }
 function activeWindOption() {
-    return WIND_OPTIONS.find(option => option.id === state.windOptionId) ?? WIND_OPTIONS[2];
+    return WIND_OPTIONS.find(option => option.id === state.windOptionId) ?? WIND_OPTIONS[WIND_OPTIONS.length - 1];
 }
 function calculateForSelectedLoad() {
     const load = ammunitionById(state.loadId);
@@ -115,12 +286,31 @@ function dataQualitySummary(load) {
     ];
     const average = scores.reduce((sum, item) => sum + item, 0) / scores.length;
     if (average >= 3.5)
-        return { score: average, label: "Hög", detail: "Majoriteten av kritiska värden har tillverkar- eller mätt källa." };
+        return { score: average, label: t("high"), detail: t("highDetail") };
     if (average >= 2.5)
-        return { score: average, label: "Medel", detail: "Blandning av mätta, publicerade och härledda värden." };
+        return { score: average, label: t("medium"), detail: t("mediumDetail") };
     if (average >= 1.8)
-        return { score: average, label: "Begränsad", detail: "Flera viktiga värden är härledda och bör verifieras." };
-    return { score: average, label: "Låg", detail: "Legacy-estimat dominerar; använd främst som struktur/referens." };
+        return { score: average, label: t("limited"), detail: t("limitedDetail") };
+    return { score: average, label: t("low"), detail: t("lowDetail") };
+}
+function renderPreferenceBar() {
+    const langButtons = ["sv", "en"].map(language => `
+    <button class="pref-chip ${state.language === language ? "active" : ""}" data-language="${language}">${language.toUpperCase()}</button>
+  `).join("");
+    const themes = [
+        { id: "light", label: t("light") },
+        { id: "dark", label: t("dark") },
+        { id: "system", label: t("system") }
+    ];
+    const themeButtons = themes.map(theme => `
+    <button class="pref-chip ${state.themeMode === theme.id ? "active" : ""}" data-theme-mode="${theme.id}">${escapeHtml(theme.label)}</button>
+  `).join("");
+    return `
+    <div class="pref-bar">
+      <div class="pref-group"><span>${t("language")}</span>${langButtons}</div>
+      <div class="pref-group"><span>${t("theme")}</span>${themeButtons}</div>
+    </div>
+  `;
 }
 function renderCaliberTabs() {
     return CALIBERS.map(caliber => `
@@ -154,18 +344,18 @@ function renderZeroButtons() {
 }
 function renderSightPresets() {
     const presets = [
-        { label: "Pistol", value: 2.5 },
-        { label: "Kikare", value: 3.8 },
-        { label: "AR-järn", value: 6.3 }
+        { label: t("pistol"), value: 2.5 },
+        { label: t("scope"), value: 3.8 },
+        { label: t("arIrons"), value: 6.3 }
     ];
     return presets.map(preset => `
-    <button class="mini-chip" data-sight="${preset.value}">${preset.label} ${preset.value.toFixed(1)}</button>
+    <button class="mini-chip" data-sight="${preset.value}">${escapeHtml(preset.label)} ${preset.value.toFixed(1)}</button>
   `).join("");
 }
 function renderWindButtons() {
     return WIND_OPTIONS.map(option => `
     <button class="chip ${option.id === state.windOptionId ? "active" : ""}" data-wind-option="${option.id}">
-      ${option.label}<small>${option.desc}</small>
+      ${option.label}<small>${escapeHtml(t(option.descKey))}</small>
     </button>
   `).join("");
 }
@@ -175,18 +365,18 @@ function renderDropTable(caliberColor, calculations) {
     <section class="panel table-panel">
       <div class="panel-head">
         <div>
-          <h2>■ BERÄKNAD DATA</h2>
-          <p>Kulfall relativt siktlinje. Nollningskolumnen markeras med ◉.</p>
+          <h2>${t("calculatedData")}</h2>
+          <p>${t("calculatedHelp")}</p>
         </div>
-        <button id="toggleUnits" class="ghost-button">${state.showMrad ? "Visa cm" : "Visa MRAD"}</button>
+        <button id="toggleUnits" class="ghost-button">${state.showMrad ? t("showCm") : t("showMrad")}</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Pipa</th>
+              <th>${t("barrel")}</th>
               <th>MV</th>
-              <th>Källa</th>
+              <th>${t("source")}</th>
               ${DISTANCES_M.map(distance => `<th class="${distance === state.zeroM ? "zero-col" : ""}">${distance} m${distance === state.zeroM ? " ◉" : ""}</th>`).join("")}
             </tr>
           </thead>
@@ -213,25 +403,27 @@ function renderDropTable(caliberColor, calculations) {
         <span><i class="dot hot"></i> 25–75 cm</span>
         <span><i class="dot danger"></i> &gt;75 cm</span>
       </div>
+      <span class="sr-only">${unitHeader}</span>
     </section>
   `;
 }
 function renderWindTable(calculations) {
-    if (state.windSpeedMs <= 0 || activeWindOption().factor <= 0)
+    const windOption = activeWindOption();
+    if (state.windSpeedMs <= 0 || windOption.factor <= 0)
         return "";
     return `
     <section class="panel table-panel wind-panel">
       <div class="panel-head">
         <div>
-          <h2>■ VINDAVDRIFT</h2>
-          <p>Approximation via lag-regel: ${state.windSpeedMs} m/s · ${activeWindOption().label} · ${activeWindOption().desc}.</p>
+          <h2>${t("windDrift")}</h2>
+          <p>${t("windHelpPrefix")}: ${state.windSpeedMs} m/s · ${windOption.label} · ${escapeHtml(t(windOption.descKey))}.</p>
         </div>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Pipa</th>
+              <th>${t("barrel")}</th>
               <th>MV</th>
               ${DISTANCES_M.map(distance => `<th>${distance} m</th>`).join("")}
             </tr>
@@ -276,41 +468,41 @@ function renderDataAudit(load) {
     <aside class="panel audit-panel">
       <div class="audit-top">
         <div>
-          <h2>Datakvalitet: ${quality.label}</h2>
+          <h2>${t("dataQuality")}: ${quality.label}</h2>
           <p>${quality.detail}</p>
         </div>
-        <div class="quality-meter" title="Snittpoäng ${quality.score.toFixed(2)} av 4">
+        <div class="quality-meter" title="${quality.score.toFixed(2)} / 4">
           <strong>${quality.score.toFixed(1)}</strong><span>/4</span>
         </div>
       </div>
 
       <div class="audit-grid">
         <div>
-          <span class="audit-label">Nominal MV</span>
+          <span class="audit-label">${t("nominalMv")}</span>
           <strong>${mv.value} ${mv.unit}</strong>
           <em class="${confidenceClass(mv.confidence)}">${confidenceLabel(mv.confidence)}</em>
         </div>
         <div>
-          <span class="audit-label">BC</span>
+          <span class="audit-label">${t("bc")}</span>
           <strong>${bc.value.toFixed(3)} ${bc.unit}</strong>
           <em class="${confidenceClass(bc.confidence)}">${confidenceLabel(bc.confidence)}</em>
         </div>
         <div>
-          <span class="audit-label">Pipdata</span>
+          <span class="audit-label">${t("barrelData")}</span>
           <strong>${measuredCount}/${profile.points.length}</strong>
-          <em>publicerad/mätt</em>
+          <em>${t("publishedMeasured")}</em>
         </div>
       </div>
 
       <details open>
-        <summary>Källor för vald laddning</summary>
+        <summary>${t("sourcesForLoad")}</summary>
         <ul class="source-list">
           ${[...usedSourceIds].map(sourceId => `<li>${renderSourceLink(sourceId)}</li>`).join("")}
         </ul>
       </details>
 
       <details>
-        <summary>Kommentarer</summary>
+        <summary>${t("comments")}</summary>
         <ul class="notes-list">
           ${load.notes.map(note => `<li>${escapeHtml(note)}</li>`).join("")}
           ${profile.notes ? `<li>${escapeHtml(profile.notes)}</li>` : ""}
@@ -324,8 +516,8 @@ function renderMuzzleVelocityPanel(load) {
     return `
     <section class="panel mv-panel">
       <div class="panel-head compact">
-        <h2>Utgångshastighet — vald laddning</h2>
-        <p>Varje rad visar metod och källklassning.</p>
+        <h2>${t("muzzleVelocity")}</h2>
+        <p>${t("mvHelp")}</p>
       </div>
       <div class="mv-grid">
         ${profile.points.map(point => `
@@ -345,13 +537,13 @@ function renderCribCard(load, calculations, caliberColor) {
     <section id="crib" class="panel crib-panel">
       <div class="panel-head">
         <div>
-          <h2>SNABBKORT</h2>
-          <p>${escapeHtml(load.displayName)} · Zero ${state.zeroM} m · Sikthöjd ${state.sightHeightCm.toFixed(1)} cm</p>
+          <h2>${t("cribCard")}</h2>
+          <p>${escapeHtml(load.displayName)} · ${t("zero")} ${state.zeroM} m · ${t("sightHeight")} ${state.sightHeightCm.toFixed(1)} cm</p>
         </div>
-        <button id="printCrib" class="accent-button" style="--accent:${caliberColor}">Skriv ut</button>
+        <button id="printCrib" class="accent-button" style="--accent:${caliberColor}">${t("print")}</button>
       </div>
       <div class="crib-grid">
-        ${calculations.slice(0, 4).map(calc => `
+        ${calculations.slice(0, 6).map(calc => `
           <article class="crib-card">
             <h3>${calc.barrel.barrelLengthIn}&quot; · ${Math.round(calc.barrel.velocityFps)} fps</h3>
             ${calc.points.map(point => `
@@ -370,16 +562,17 @@ function render() {
     const calculations = calculateForSelectedLoad();
     appRoot.innerHTML = `
     <div class="shell" style="--accent:${caliber.color};--glow:${caliber.glow}">
+      ${renderPreferenceBar()}
       <header class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">KÄLLSPÅRAD BALLISTIK · v${APP_VERSION}</p>
-          <h1>BULLET DROP <span>REFERENSGUIDE</span></h1>
-          <p class="subtitle">Kulfall & vindavdrift med explicit datakvalitet, källor och osäkerhetsklassning.</p>
+          <p class="eyebrow">${t("appEyebrow")} · v${APP_VERSION}</p>
+          <h1>${t("title")} <span>${t("titleSub")}</span></h1>
+          <p class="subtitle">${t("subtitle")}</p>
         </div>
         <div class="hero-card">
-          <span>ATMOSFÄR</span>
+          <span>${t("atmosphere")}</span>
           <strong>${state.temperatureC}°C · ${state.pressureHPa} hPa</strong>
-          <em>ρ ${atmosphere.airDensityKgM3.toFixed(3)} kg/m³ · ljud ${Math.round(atmosphere.speedOfSoundMs)} m/s</em>
+          <em>ρ ${atmosphere.airDensityKgM3.toFixed(3)} kg/m³ · ${Math.round(atmosphere.speedOfSoundMs)} m/s</em>
         </div>
       </header>
 
@@ -389,34 +582,34 @@ function render() {
 
       <section class="panel controls-panel">
         <div class="control wide">
-          <span>Laddning</span>
+          <span>${t("load")}</span>
           <select id="loadSelect">${renderLoadOptions()}</select>
         </div>
         <div class="control zero-control">
-          <span>Nollning</span>
+          <span>${t("zero")}</span>
           <div class="chip-row">${renderZeroButtons()}</div>
         </div>
-        ${renderNumberControl("Sikthöjd över pipa", "sightInput", state.sightHeightCm, 0, 12, 0.1, "cm")}
+        ${renderNumberControl(t("sightHeight"), "sightInput", state.sightHeightCm, 0, 12, 0.1, "cm")}
         <div class="control presets">
-          <span>Snabbval sikthöjd</span>
+          <span>${t("sightPresets")}</span>
           <div class="chip-row">${renderSightPresets()}</div>
         </div>
-        ${renderNumberControl("Temperatur", "tempInput", state.temperatureC, -30, 45, 1, "°C")}
-        ${renderNumberControl("Lufttryck", "pressureInput", state.pressureHPa, 850, 1080, 1, "hPa")}
-        ${renderNumberControl("Vind", "windInput", state.windSpeedMs, 0, 25, 0.5, "m/s")}
+        ${renderNumberControl(t("temperature"), "tempInput", state.temperatureC, -30, 45, 1, "°C")}
+        ${renderNumberControl(t("pressure"), "pressureInput", state.pressureHPa, 850, 1080, 1, "hPa")}
+        ${renderNumberControl(t("wind"), "windInput", state.windSpeedMs, 0, 25, 0.5, "m/s")}
         <div class="control wind-control">
-          <span>Vindvinkel</span>
+          <span>${t("windAngle")}</span>
           <div class="chip-row">${renderWindButtons()}</div>
         </div>
       </section>
 
       <section class="load-summary" style="--accent:${caliber.color}">
         <div>
-          <p class="eyebrow">VALD RAD</p>
+          <p class="eyebrow">${t("selected")}</p>
           <h2>${escapeHtml(caliber.label)} · ${escapeHtml(load.displayName)}</h2>
-          <p>${load.bulletWeightGr} gr · ${escapeHtml(load.bulletType)} · BC ${load.ballisticCoefficientG1.value.toFixed(3)} G1 · nominal MV ${load.nominalMuzzleVelocity.value} ${load.nominalMuzzleVelocity.unit}</p>
+          <p>${load.bulletWeightGr} gr · ${escapeHtml(load.bulletType)} · BC ${load.ballisticCoefficientG1.value.toFixed(3)} G1 · ${t("nominalMv")} ${load.nominalMuzzleVelocity.value} ${load.nominalMuzzleVelocity.unit}</p>
         </div>
-        <a href="#audit" class="accent-link">Visa källor</a>
+        <a href="#audit" class="accent-link">${t("showSources")}</a>
       </section>
 
       <div class="main-grid">
@@ -429,30 +622,36 @@ function render() {
         <div id="audit" class="stack side-stack">
           ${renderDataAudit(load)}
           <section class="panel notes-panel">
-            <h2>OBSERVERA</h2>
+            <h2>${t("notes")}</h2>
             <ul>
-              <li>Kulfall beräknas relativt siktlinje med sikthöjd och vald nollning.</li>
-              <li>G1-drag använder numerisk integration; vind är separat approximation via lag-regel.</li>
-              <li>Temperatur påverkar både lufttäthet och ljudhastighet/Mach.</li>
-              <li>Alla piplängdsvärden ska verifieras med din ammunition, ditt vapen och din nollning.</li>
+              <li>${t("note1")}</li>
+              <li>${t("note2")}</li>
+              <li>${t("note3")}</li>
+              <li>${t("note4")}</li>
             </ul>
           </section>
           <section class="panel source-catalog">
-            <h2>Källkatalog</h2>
-            <p>${SOURCES.length} källposter finns i datamodellen. Endast relevanta källor för vald laddning visas öppet ovan.</p>
+            <h2>${t("sourceCatalog")}</h2>
+            <p>${SOURCES.length} ${t("catalogText")}</p>
           </section>
         </div>
       </div>
 
       <footer class="footer">
-        <span>G1 numerisk integration · spårbar data · cache ${APP_VERSION}</span>
-        <span>tacticaljunkyard.com</span>
+        <span>${t("footerLeft")} · cache ${APP_VERSION}</span>
+        <span>${t("footerRight")}</span>
       </footer>
     </div>
   `;
     bindEvents();
 }
 function bindEvents() {
+    document.querySelectorAll("[data-language]").forEach(button => {
+        button.addEventListener("click", () => setState({ language: button.dataset.language ?? state.language }));
+    });
+    document.querySelectorAll("[data-theme-mode]").forEach(button => {
+        button.addEventListener("click", () => setState({ themeMode: button.dataset.themeMode ?? state.themeMode }));
+    });
     document.querySelectorAll("[data-caliber]").forEach(button => {
         button.addEventListener("click", () => setState({ caliberId: button.dataset.caliber ?? state.caliberId }));
     });
@@ -478,6 +677,7 @@ function bindEvents() {
     document.getElementById("toggleUnits")?.addEventListener("click", () => setState({ showMrad: !state.showMrad }));
     document.getElementById("printCrib")?.addEventListener("click", () => window.print());
 }
+applyPreferences();
 render();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -486,7 +686,6 @@ if ("serviceWorker" in navigator) {
         });
     });
 }
-// Light smoke-test hook for non-browser tests.
 export const __appVersion = APP_VERSION;
 export const __defaultState = state;
 export const __calculateForSelectedLoad = calculateForSelectedLoad;

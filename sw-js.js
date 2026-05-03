@@ -1,4 +1,4 @@
-const CACHE = "bulletdrop-v1.4.0";
+const CACHE = "bulletdrop-v1.4.1";
 const ASSETS = ["/", "/index.html", "/assets/main.js", "/assets/styles.css", "/manifest.json"];
 
 self.addEventListener("install", event => {
