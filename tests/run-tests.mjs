@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { calculateAtmosphere } from "../assets/core/atmosphere.js";
 import { calculateTrajectory } from "../assets/core/trajectory.js";
-import { cmToMoa, cmToMrad, fpsToMs, msToFps } from "../assets/core/units.js";
+import { cmToInch, cmToMoa, cmToMrad, fpsToMs, hPaToInHg, inHgToHPa, mToYard, mphToMs, msToFps, msToMph, yardToM } from "../assets/core/units.js";
 import { AMMUNITION, ammunitionById, BARREL_PROFILES, CALIBERS, profileByLoadId, SOURCES } from "../assets/data/index.js";
 
 const approx = (actual, expected, tolerance, message) => {
@@ -13,6 +13,11 @@ function testUnits() {
   approx(msToFps(321), 1053.15, 0.01, "msToFps converts 321 m/s");
   approx(cmToMrad(10, 100), 1, 0.0001, "10 cm at 100 m is 1 mrad");
   approx(cmToMoa(2.9089, 100), 1, 0.01, "2.9089 cm at 100 m is about 1 MOA");
+  approx(cmToInch(2.54), 1, 0.0001, "2.54 cm is 1 inch");
+  approx(yardToM(100), 91.44, 0.0001, "100 yards to meters");
+  approx(mToYard(91.44), 100, 0.0001, "91.44 meters to yards");
+  approx(msToMph(mphToMs(10)), 10, 0.0001, "mph roundtrip");
+  approx(inHgToHPa(hPaToInHg(1013.25)), 1013.25, 0.001, "pressure roundtrip");
 }
 
 function testAtmosphere() {

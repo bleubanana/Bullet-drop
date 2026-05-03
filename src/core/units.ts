@@ -2,6 +2,9 @@ export const FPS_TO_MS = 0.3048;
 export const MS_TO_FPS = 1 / FPS_TO_MS;
 export const INCH_TO_CM = 2.54;
 export const YARD_TO_M = 0.9144;
+export const MPH_TO_MS = 0.44704;
+export const HPA_TO_INHG = 0.029529983071445;
+export const KG_M3_TO_LB_FT3 = 0.0624279605761;
 
 export function fpsToMs(value: number): number {
   return value * FPS_TO_MS;
@@ -13,6 +16,38 @@ export function msToFps(value: number): number {
 
 export function inchToCm(value: number): number {
   return value * INCH_TO_CM;
+}
+
+export function cmToInch(value: number): number {
+  return value / INCH_TO_CM;
+}
+
+export function yardToM(value: number): number {
+  return value * YARD_TO_M;
+}
+
+export function mToYard(value: number): number {
+  return value / YARD_TO_M;
+}
+
+export function mphToMs(value: number): number {
+  return value * MPH_TO_MS;
+}
+
+export function msToMph(value: number): number {
+  return value / MPH_TO_MS;
+}
+
+export function hPaToInHg(value: number): number {
+  return value * HPA_TO_INHG;
+}
+
+export function inHgToHPa(value: number): number {
+  return value / HPA_TO_INHG;
+}
+
+export function kgM3ToLbFt3(value: number): number {
+  return value * KG_M3_TO_LB_FT3;
 }
 
 export function roundTo(value: number, decimals = 1): number {

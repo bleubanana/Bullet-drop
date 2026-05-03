@@ -1,5 +1,5 @@
 import type { BarrelVelocityPoint, TrajectoryPoint } from "./core/types.js";
-import { msToFps } from "./core/units.js";
+import { mToYard, msToFps } from "./core/units.js";
 declare const I18N: {
     readonly sv: {
         readonly appEyebrow: "KÄLLSPÅRAD BALLISTIK";
@@ -8,6 +8,9 @@ declare const I18N: {
         readonly subtitle: "Kulfall & vindavdrift med explicit datakvalitet, källor och osäkerhetsklassning.";
         readonly atmosphere: "ATMOSFÄR";
         readonly language: "Språk";
+        readonly units: "Enheter";
+        readonly metric: "Metrisk";
+        readonly imperial: "Imperial";
         readonly theme: "Tema";
         readonly light: "Ljust";
         readonly dark: "Mörkt";
@@ -25,8 +28,8 @@ declare const I18N: {
         readonly windAngle: "Vindvinkel";
         readonly calculatedData: "■ BERÄKNAD DATA";
         readonly calculatedHelp: "Kulfall relativt siktlinje. Nollningskolumnen markeras med ◉.";
-        readonly showCm: "Visa cm";
-        readonly showMrad: "Visa MRAD";
+        readonly showLinear: "Visa linjärt";
+        readonly showAngular: "Visa vinkel";
         readonly barrel: "Pipa";
         readonly source: "Källa";
         readonly windDrift: "■ VINDAVDRIFT";
@@ -68,6 +71,15 @@ declare const I18N: {
         readonly noWind: "Medvind/motvind";
         readonly halfWind: "Half value";
         readonly fullWind: "Full value";
+        readonly localWeather: "Platsväder";
+        readonly useLocalWeather: "Hämta platsväder";
+        readonly weatherIdle: "ISA-standard används tills platsväder hämtas.";
+        readonly weatherLoading: "Hämtar position och väder…";
+        readonly weatherReady: "Platsväder används";
+        readonly weatherDenied: "Platsåtkomst nekades — manuella värden används.";
+        readonly weatherUnavailable: "Platsväder är inte tillgängligt i denna webbläsare.";
+        readonly weatherError: "Kunde inte hämta platsväder — manuella värden används.";
+        readonly weatherSource: "Open-Meteo";
     };
     readonly en: {
         readonly appEyebrow: "SOURCE-TRACKED BALLISTICS";
@@ -76,6 +88,9 @@ declare const I18N: {
         readonly subtitle: "Bullet drop and wind drift with explicit data quality, sources and uncertainty classification.";
         readonly atmosphere: "ATMOSPHERE";
         readonly language: "Language";
+        readonly units: "Units";
+        readonly metric: "Metric";
+        readonly imperial: "Imperial";
         readonly theme: "Theme";
         readonly light: "Light";
         readonly dark: "Dark";
@@ -93,8 +108,8 @@ declare const I18N: {
         readonly windAngle: "Wind angle";
         readonly calculatedData: "■ CALCULATED DATA";
         readonly calculatedHelp: "Drop relative to line of sight. The zero column is marked with ◉.";
-        readonly showCm: "Show cm";
-        readonly showMrad: "Show MRAD";
+        readonly showLinear: "Show linear";
+        readonly showAngular: "Show angular";
         readonly barrel: "Barrel";
         readonly source: "Source";
         readonly windDrift: "■ WIND DRIFT";
@@ -136,13 +151,25 @@ declare const I18N: {
         readonly noWind: "Tail/head wind";
         readonly halfWind: "Half value";
         readonly fullWind: "Full value";
+        readonly localWeather: "Local weather";
+        readonly useLocalWeather: "Use local weather";
+        readonly weatherIdle: "ISA standard is used until local weather is loaded.";
+        readonly weatherLoading: "Getting position and weather…";
+        readonly weatherReady: "Local weather is active";
+        readonly weatherDenied: "Location access denied — manual values are used.";
+        readonly weatherUnavailable: "Local weather is not available in this browser.";
+        readonly weatherError: "Could not load local weather — manual values are used.";
+        readonly weatherSource: "Open-Meteo";
     };
 };
 type Language = keyof typeof I18N;
 type ThemeMode = "light" | "dark" | "system";
+type UnitSystem = "metric" | "imperial";
 type WindOptionId = "no" | "half" | "full";
+type WeatherStatus = "idle" | "loading" | "ready" | "denied" | "unavailable" | "error";
 type State = {
     language: Language;
+    unitSystem: UnitSystem;
     themeMode: ThemeMode;
     systemDark: boolean;
     caliberId: string;
@@ -153,15 +180,18 @@ type State = {
     pressureHPa: number;
     windSpeedMs: number;
     windOptionId: WindOptionId;
-    showMrad: boolean;
+    showAngular: boolean;
+    weatherStatus: WeatherStatus;
+    weatherMessage: string | null;
 };
 type BarrelCalculation = {
     barrel: BarrelVelocityPoint;
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.1";
+export declare const __appVersion = "1.4.2";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;
+export declare const __mToYard: typeof mToYard;
 export {};

@@ -2,14 +2,16 @@
 
 Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 
-## Vad som ändrats i v1.4.1
+## Vad som ändrats i v1.4.2
 
 - Ballistikmotorn är separerad från UI:t.
 - Ammunitionsdata ligger i en källspårad datamodell.
 - Varje kritiskt värde har `confidence`, `method` och `sourceRefs`.
 - 9 mm-profilerna visar faktiska BBTI-punkter även när längre pipor tappar hastighet.
 - Språkval är tillbaka: svenska och engelska.
+- Enhetsval är tillagt: metriskt är default, imperial kan väljas i toppbaren.
 - Temaval är tillbaka: ljust, mörkt och system.
+- Appen försöker hämta platsväder via webbläsarens geolocation och Open-Meteo för temperatur och lokalt lufttryck.
 - Atmosfärsmodellen justerar både luftdensitet och ljudhastighet efter temperatur.
 - Vind visas som approximation via lag-regel, inte som full 3D-lösning.
 - Appen använder inte längre browser-Babel eller CDN-React.
@@ -39,7 +41,7 @@ och committa uppdaterade filer i `assets/`.
 
 ## Viktiga antaganden
 
-Detta är en referenskalkylator, inte ett ersättningsvärde för praktisk verifiering. Faktiskt träffläge påverkas av ammunitionens lot, pipa, kronograferad hastighet, sikthöjd, nollning, temperatur, lufttryck och skyttens system.
+Detta är en referenskalkylator, inte ett ersättningsvärde för praktisk verifiering. Faktiskt träffläge påverkas av ammunitionens lot, pipa, kronograferad hastighet, sikthöjd, nollning, temperatur, lufttryck och skyttens system. Platsväder kräver HTTPS/localhost och att användaren godkänner platsåtkomst; annars används manuella/ISA-värden.
 
 ## Datakvalitet
 
