@@ -2,7 +2,7 @@
 
 Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 
-## Vad som ändrats i v1.4.6
+## Vad som ändrats i v1.4.7
 
 - Ballistikmotorn är separerad från UI:t.
 - Ammunitionsdata ligger i en källspårad datamodell.
@@ -11,13 +11,15 @@ Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 - Språkval är tillbaka: svenska och engelska.
 - Enhetsval är tillagt: metriskt är default, imperial kan väljas i toppbaren.
 - Temaval är tillbaka: ljust, mörkt och system.
-- Appen försöker hämta platsväder via webbläsarens geolocation och Open-Meteo för temperatur och lokalt lufttryck.
+- Appen försöker hämta platsväder via webbläsarens geolocation och Open-Meteo för temperatur, lokalt lufttryck, vindhastighet och vindriktning.
 - Atmosfärsmodellen justerar både luftdensitet och ljudhastighet efter temperatur.
+- Vindhastighet kan förifyllas från platsväder. Vindriktning visas som meteorologisk riktning, men skjutvinkel måste väljas manuellt eftersom appen inte känner skjutriktningen.
 - Vind visas som approximation via lag-regel, inte som full 3D-lösning.
 - Appen använder inte längre browser-Babel eller CDN-React.
 - Fler produktnivåreferenser har lagts till för .22 LR, 9×19, .223 Rem, .308 Win och 6.5 Creedmoor.
 - S&B-, GGG-, GECO-, CCI- och Aguila-rader har lagts till med `manufacturer-published` där värdena kunde verifieras.
 - En testsvit verifierar enheter, atmosfär, nollning och dataintegritet.
+- Manifest och iOS-meta-taggar är justerade för installation som webbapp via Safari / Lägg till på hemskärmen.
 
 ## Lokal körning
 

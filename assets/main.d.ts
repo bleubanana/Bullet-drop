@@ -26,6 +26,8 @@ declare const I18N: {
         readonly pressure: "Lufttryck";
         readonly wind: "Vind";
         readonly windAngle: "Vindvinkel";
+        readonly windDirection: "Vindriktning";
+        readonly windDirectionNote: "Meteorologisk riktning. Skjutriktning är okänd, så välj vindvinkel manuellt.";
         readonly calculatedData: "■ BERÄKNAD DATA";
         readonly calculatedHelp: "Kulfall relativt siktlinje. Nollningskolumnen markeras med ◉.";
         readonly showLinear: "Visa linjärt";
@@ -110,6 +112,8 @@ declare const I18N: {
         readonly pressure: "Pressure";
         readonly wind: "Wind";
         readonly windAngle: "Wind angle";
+        readonly windDirection: "Wind direction";
+        readonly windDirectionNote: "Meteorological direction. Firing direction is unknown, so choose wind angle manually.";
         readonly calculatedData: "■ CALCULATED DATA";
         readonly calculatedHelp: "Drop relative to line of sight. The zero column is marked with ◉.";
         readonly showLinear: "Show linear";
@@ -187,6 +191,7 @@ type State = {
     temperatureC: number;
     pressureHPa: number;
     windSpeedMs: number;
+    windDirectionDeg: number | null;
     windOptionId: WindOptionId;
     showAngular: boolean;
     weatherStatus: WeatherStatus;
@@ -198,7 +203,7 @@ type BarrelCalculation = {
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.6";
+export declare const __appVersion = "1.4.7";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;

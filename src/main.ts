@@ -18,7 +18,7 @@ import {
 } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
 
-const APP_VERSION = "1.4.6";
+const APP_VERSION = "1.4.7";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300] as const;
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200] as const;
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -49,6 +49,8 @@ const I18N = {
     pressure: "Lufttryck",
     wind: "Vind",
     windAngle: "Vindvinkel",
+    windDirection: "Vindriktning",
+    windDirectionNote: "Meteorologisk riktning. Skjutriktning är okänd, så välj vindvinkel manuellt.",
     calculatedData: "■ BERÄKNAD DATA",
     calculatedHelp: "Kulfall relativt siktlinje. Nollningskolumnen markeras med ◉.",
     showLinear: "Visa linjärt",
@@ -133,6 +135,8 @@ const I18N = {
     pressure: "Pressure",
     wind: "Wind",
     windAngle: "Wind angle",
+    windDirection: "Wind direction",
+    windDirectionNote: "Meteorological direction. Firing direction is unknown, so choose wind angle manually.",
     calculatedData: "■ CALCULATED DATA",
     calculatedHelp: "Drop relative to line of sight. The zero column is marked with ◉.",
     showLinear: "Show linear",
@@ -224,6 +228,7 @@ type State = {
   temperatureC: number;
   pressureHPa: number;
   windSpeedMs: number;
+  windDirectionDeg: number | null;
   windOptionId: WindOptionId;
   showAngular: boolean;
   weatherStatus: WeatherStatus;
@@ -242,6 +247,8 @@ type OpenMeteoResponse = {
     temperature_2m?: number;
     surface_pressure?: number;
     pressure_msl?: number;
+    wind_speed_10m?: number;
+    wind_direction_10m?: number;
   };
 };
 
@@ -306,6 +313,7 @@ const state: State = {
   temperatureC: 15,
   pressureHPa: 1013.25,
   windSpeedMs: 0,
+  windDirectionDeg: null,
   windOptionId: "full",
   showAngular: false,
   weatherStatus: "idle",
@@ -478,6 +486,20 @@ function formatPressure(valueHPa: number): string {
 function formatWindSpeed(valueMs: number): string {
   if (state.unitSystem === "imperial") return `${roundTo(msToMph(valueMs), 1)} mph`;
   return `${roundTo(valueMs, 1)} m/s`;
+}
+
+function compassDirection(degrees: number): string {
+  const normalized = ((degrees % 360) + 360) % 360;
+  const sv = ["N", "NNO", "NO", "ONO", "O", "OSO", "SO", "SSO", "S", "SSV", "SV", "VSV", "V", "VNV", "NV", "NNV"];
+  const en = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const idx = Math.round(normalized / 22.5) % 16;
+  return (state.language === "sv" ? sv : en)[idx] ?? "N";
+}
+
+function formatWindDirection(degrees: number | null): string {
+  if (degrees === null || !Number.isFinite(degrees)) return "—";
+  const normalized = Math.round(((degrees % 360) + 360) % 360);
+  return `${normalized}° ${compassDirection(normalized)}`;
 }
 
 function formatAirDensity(valueKgM3: number): string {
@@ -878,6 +900,18 @@ function weatherStatusText(): string {
   }
 }
 
+function renderAtmosphereWindSummary(): string {
+  const direction = formatWindDirection(state.windDirectionDeg);
+  const note = state.windDirectionDeg === null ? "" : `<small>${t("windDirectionNote")}</small>`;
+  return `
+    <div class="atmosphere-wind">
+      <span>${t("wind")}: <strong>${formatWindSpeed(state.windSpeedMs)}</strong></span>
+      <span>${t("windDirection")}: <strong>${direction}</strong></span>
+      ${note}
+    </div>
+  `;
+}
+
 function renderWeatherControl(): string {
   const disabled = state.weatherStatus === "loading" ? "disabled" : "";
   return `
@@ -917,6 +951,7 @@ function render(): void {
           <span>${t("atmosphere")}</span>
           <strong>${formatTemperature(state.temperatureC)} · ${formatPressure(state.pressureHPa)}</strong>
           <em>ρ ${formatAirDensity(atmosphere.airDensityKgM3)} · ${formatSoundSpeed(atmosphere.speedOfSoundMs)}</em>
+          ${renderAtmosphereWindSummary()}
           ${renderWeatherControl()}
         </div>
       </header>
@@ -1040,19 +1075,19 @@ function bindEvents(): void {
   const tempInput = document.getElementById("tempInput") as HTMLInputElement | null;
   tempInput?.addEventListener("change", () => {
     const value = Number(tempInput.value);
-    setState({ temperatureC: state.unitSystem === "imperial" ? (value - 32) * 5 / 9 : value, weatherStatus: "idle", weatherMessage: null });
+    setState({ temperatureC: state.unitSystem === "imperial" ? (value - 32) * 5 / 9 : value, weatherStatus: "idle", weatherMessage: null, windDirectionDeg: null });
   });
 
   const pressureInput = document.getElementById("pressureInput") as HTMLInputElement | null;
   pressureInput?.addEventListener("change", () => {
     const value = Number(pressureInput.value);
-    setState({ pressureHPa: state.unitSystem === "imperial" ? inHgToHPa(value) : value, weatherStatus: "idle", weatherMessage: null });
+    setState({ pressureHPa: state.unitSystem === "imperial" ? inHgToHPa(value) : value, weatherStatus: "idle", weatherMessage: null, windDirectionDeg: null });
   });
 
   const windInput = document.getElementById("windInput") as HTMLInputElement | null;
   windInput?.addEventListener("change", () => {
     const value = Number(windInput.value);
-    setState({ windSpeedMs: state.unitSystem === "imperial" ? mphToMs(value) : value });
+    setState({ windSpeedMs: state.unitSystem === "imperial" ? mphToMs(value) : value, weatherStatus: "idle", weatherMessage: null, windDirectionDeg: null });
   });
 
   document.getElementById("toggleUnits")?.addEventListener("click", () => setState({ showAngular: !state.showAngular }));
@@ -1089,7 +1124,7 @@ async function fetchLocalWeather(position: GeolocationPosition, requestId: numbe
     const params = new URLSearchParams({
       latitude: position.coords.latitude.toFixed(5),
       longitude: position.coords.longitude.toFixed(5),
-      current: "temperature_2m,surface_pressure",
+      current: "temperature_2m,surface_pressure,wind_speed_10m,wind_direction_10m",
       temperature_unit: "celsius",
       wind_speed_unit: "ms",
       timezone: "auto",
@@ -1100,12 +1135,16 @@ async function fetchLocalWeather(position: GeolocationPosition, requestId: numbe
     const data = await response.json() as OpenMeteoResponse;
     const temp = data.current?.temperature_2m;
     const pressure = data.current?.surface_pressure ?? data.current?.pressure_msl;
+    const windSpeed = data.current?.wind_speed_10m;
+    const windDirection = data.current?.wind_direction_10m;
     if (typeof temp !== "number" || typeof pressure !== "number") throw new Error("Weather response missing temperature or pressure");
     if (requestId !== weatherRequestCounter) return;
     const weatherTime = data.current?.time ? `${t("weatherSource")} ${data.current.time.replace("T", " ")}` : t("weatherSource");
     setState({
       temperatureC: roundTo(temp, 1),
       pressureHPa: roundTo(pressure, 0),
+      windSpeedMs: typeof windSpeed === "number" ? roundTo(windSpeed, 1) : state.windSpeedMs,
+      windDirectionDeg: typeof windDirection === "number" ? roundTo(windDirection, 0) : null,
       weatherStatus: "ready",
       weatherMessage: weatherTime
     });

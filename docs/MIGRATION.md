@@ -44,3 +44,12 @@ The app also calls `registration.update()` on load and then once per hour while 
 ## v1.4.6 iPhone/mobile layout
 
 Added mobile containment rules so wide ballistic tables scroll inside their cards instead of widening the whole page. Preference groups, caliber tabs and preset chip rows are horizontally scrollable on small screens. Long source titles and footer text now wrap safely.
+
+
+## v1.4.7 — Location wind and iPhone web app support
+
+- Local weather now requests `wind_speed_10m` and `wind_direction_10m` from Open-Meteo in addition to temperature and surface pressure.
+- The wind speed field is pre-filled from local weather when permission is granted.
+- Wind direction is displayed in the atmosphere card as meteorological direction. It does not automatically infer crosswind angle because the app does not know the user's firing bearing.
+- Manifest now uses relative `start_url` and `scope` so GitHub Pages subfolder deployments work better.
+- iOS web app meta tags and Apple touch icons are included for Safari Add to Home Screen installation.
