@@ -1,8 +1,16 @@
-const CACHE = "bulletdrop-v1.4.2";
-const ASSETS = ["/", "/index.html", "/assets/main.js", "/assets/styles.css", "/manifest.json"];
+const CACHE = "bulletdrop-v1.4.3";
+const SCOPE = self.registration.scope;
+const ASSETS = ["./", "./index.html", "./assets/main.js", "./assets/styles.css", "./manifest.json"]
+  .map(path => new URL(path, SCOPE).toString());
+const INDEX_URL = new URL("./index.html", SCOPE).toString();
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
+      .catch(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", event => {
@@ -20,7 +28,7 @@ self.addEventListener("fetch", event => {
   if (url.hostname.includes("open-meteo.com")) return;
 
   if (event.request.mode === "navigate") {
-    event.respondWith(fetch(event.request).catch(() => caches.match("/index.html")));
+    event.respondWith(fetch(event.request).catch(() => caches.match(INDEX_URL)));
     return;
   }
 

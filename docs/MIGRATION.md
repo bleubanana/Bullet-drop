@@ -1,8 +1,8 @@
-# Migration till v1.4.2
+# Migration till v1.4.3
 
 ## Strukturell ändring
 
-Den tidigare single-file-versionen låg nästan helt i `index.html`. v1.4.2 delar upp projektet:
+Den tidigare single-file-versionen låg nästan helt i `index.html`. v1.4.3 delar upp projektet:
 
 ```text
 src/

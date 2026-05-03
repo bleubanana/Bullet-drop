@@ -2,7 +2,7 @@ import { calculateAtmosphere } from "./core/atmosphere.js";
 import { calculateTrajectory } from "./core/trajectory.js";
 import { cmToInch, fpsToMs, formatSigned, hPaToInHg, inHgToHPa, inchToCm, kgM3ToLbFt3, mToYard, mphToMs, msToFps, msToMph, roundTo, yardToM } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
-const APP_VERSION = "1.4.2";
+const APP_VERSION = "1.4.3";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300];
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200];
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -173,16 +173,48 @@ const WIND_OPTIONS = [
     { id: "half", label: "45°", factor: 0.5, descKey: "halfWind" },
     { id: "full", label: "90°", factor: 1, descKey: "fullWind" }
 ];
+function safeGetStorage(key) {
+    try {
+        return window.localStorage?.getItem(key) ?? null;
+    }
+    catch {
+        return null;
+    }
+}
+function safeSetStorage(key, value) {
+    try {
+        window.localStorage?.setItem(key, value);
+    }
+    catch {
+        // Storage may be blocked in private mode, file:// previews or strict browser policies.
+    }
+}
+function getSystemDarkPreference() {
+    try {
+        return typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)").matches : true;
+    }
+    catch {
+        return true;
+    }
+}
+function getColorSchemeMediaQuery() {
+    try {
+        return typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+    }
+    catch {
+        return null;
+    }
+}
 function readLanguage() {
-    const stored = localStorage.getItem("language");
+    const stored = safeGetStorage("language");
     return stored === "en" || stored === "sv" ? stored : "sv";
 }
 function readThemeMode() {
-    const stored = localStorage.getItem("themeMode");
+    const stored = safeGetStorage("themeMode");
     return stored === "light" || stored === "dark" || stored === "system" ? stored : "dark";
 }
 function readUnitSystem() {
-    const stored = localStorage.getItem("unitSystem");
+    const stored = safeGetStorage("unitSystem");
     return stored === "imperial" || stored === "metric" ? stored : "metric";
 }
 const initialUnitSystem = readUnitSystem();
@@ -190,7 +222,7 @@ const state = {
     language: readLanguage(),
     unitSystem: initialUnitSystem,
     themeMode: readThemeMode(),
-    systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
+    systemDark: getSystemDarkPreference(),
     caliberId: "22lr",
     loadId: "cci-standard-velocity-35",
     zeroM: initialUnitSystem === "imperial" ? yardToM(25) : 25,
@@ -207,11 +239,19 @@ const root = document.getElementById("app");
 if (!root)
     throw new Error("Missing #app element");
 const appRoot = root;
-const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-mediaQuery.addEventListener("change", event => {
-    state.systemDark = event.matches;
-    applyPreferences();
-});
+const mediaQuery = getColorSchemeMediaQuery();
+if (mediaQuery) {
+    const onThemePreferenceChange = (event) => {
+        state.systemDark = event.matches;
+        applyPreferences();
+    };
+    if (typeof mediaQuery.addEventListener === "function") {
+        mediaQuery.addEventListener("change", onThemePreferenceChange);
+    }
+    else if (typeof mediaQuery.addListener === "function") {
+        mediaQuery.addListener(onThemePreferenceChange);
+    }
+}
 function t(key) {
     return I18N[state.language][key];
 }
@@ -221,9 +261,9 @@ function setState(patch) {
     if (!loads.some(load => load.id === state.loadId)) {
         state.loadId = loads[0]?.id ?? AMMUNITION[0]?.id ?? "";
     }
-    localStorage.setItem("language", state.language);
-    localStorage.setItem("themeMode", state.themeMode);
-    localStorage.setItem("unitSystem", state.unitSystem);
+    safeSetStorage("language", state.language);
+    safeSetStorage("themeMode", state.themeMode);
+    safeSetStorage("unitSystem", state.unitSystem);
     applyPreferences();
     render();
 }
@@ -936,16 +976,36 @@ async function fetchLocalWeather(position, requestId) {
         setState({ weatherStatus: "error", weatherMessage: null });
     }
 }
-applyPreferences();
-render();
-window.addEventListener("load", () => {
-    requestLocalWeather();
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/sw-js.js").catch(error => {
-            console.warn("Service worker registration failed", error);
-        });
-    }
-});
+function renderFatalError(error) {
+    console.error("Bullet Drop failed to start", error);
+    const message = error instanceof Error ? error.message : String(error);
+    appRoot.innerHTML = `
+    <div class="shell fatal-shell">
+      <section class="panel fatal-panel">
+        <p class="eyebrow">BULLET DROP · STARTFEL</p>
+        <h1>Sidan kunde inte starta</h1>
+        <p>Detta är ett skyddsnät som visar fel i stället för en svart sida.</p>
+        <pre>${escapeHtml(message)}</pre>
+        <p class="muted">Prova hård omladdning: Ctrl+F5. Om problemet kvarstår, kontrollera att <code>assets/main.js</code> och <code>assets/styles.css</code> finns på samma nivå som <code>index.html</code>.</p>
+      </section>
+    </div>
+  `;
+}
+try {
+    applyPreferences();
+    render();
+    window.addEventListener("load", () => {
+        requestLocalWeather();
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./sw-js.js").catch(error => {
+                console.warn("Service worker registration failed", error);
+            });
+        }
+    });
+}
+catch (error) {
+    renderFatalError(error);
+}
 export const __appVersion = APP_VERSION;
 export const __defaultState = state;
 export const __calculateForSelectedLoad = calculateForSelectedLoad;
