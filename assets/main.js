@@ -4,7 +4,8 @@ import { calculateMillerStability } from "./core/stability.js";
 import { calculateTrajectory } from "./core/trajectory.js";
 import { cmToInch, fpsToMs, formatSigned, hPaToInHg, inHgToHPa, inchToCm, kgM3ToLbFt3, mToYard, mphToMs, msToFps, msToMph, roundTo, yardToM } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
-const APP_VERSION = "1.4.9";
+const APP_VERSION = "1.4.11";
+const GA_MEASUREMENT_ID = "G-P1QPSZMLX4";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300];
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200];
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -94,6 +95,11 @@ const I18N = {
         updateReadyText: "Sidan har hämtat en ny version. Ladda om för att använda senaste data och kod.",
         updateReload: "Ladda om",
         updateLater: "Senare",
+        analyticsTitle: "Integritet / Analytics",
+        analyticsText: "Vi använder Google Analytics endast om du accepterar. Det hjälper oss förstå användning och förbättra datakvalitet/funktioner. Valet sparas lokalt på din enhet.",
+        analyticsAccept: "Acceptera analytics",
+        analyticsDecline: "Avvisa",
+        analyticsPrivacy: "Ingen analytics laddas förrän du accepterar.",
         advanced: "AVANCERAT",
         twistStability: "Räffelstigning / stabilitet",
         twistRate: "Räffelstigning",
@@ -204,6 +210,11 @@ const I18N = {
         updateReadyText: "The page has downloaded a new version. Reload to use the latest data and code.",
         updateReload: "Reload",
         updateLater: "Later",
+        analyticsTitle: "Privacy / Analytics",
+        analyticsText: "We use Google Analytics only if you accept. It helps us understand usage and improve data quality/features. The choice is stored locally on your device.",
+        analyticsAccept: "Accept analytics",
+        analyticsDecline: "Decline",
+        analyticsPrivacy: "No analytics is loaded until you accept.",
         advanced: "ADVANCED",
         twistStability: "Twist / stability",
         twistRate: "Twist rate",
@@ -278,6 +289,9 @@ function readThemeMode() {
 function readUnitSystem() {
     const stored = safeGetStorage("unitSystem");
     return stored === "imperial" || stored === "metric" ? stored : "metric";
+}
+function readAnalyticsConsent() {
+    return "accepted";
 }
 function readNumber(key, fallback) {
     const raw = safeGetStorage(key);
@@ -384,7 +398,8 @@ const state = {
     showAngular: false,
     weatherStatus: "idle",
     weatherMessage: null,
-    updateReady: false
+    updateReady: false,
+    analyticsConsent: readAnalyticsConsent()
 };
 const root = document.getElementById("app");
 if (!root)
@@ -429,6 +444,7 @@ function setState(patch) {
     safeSetStorage(`twistIn:${state.caliberId}`, String(state.twistInPerTurn));
     safeSetStorage("coriolisEnabled", String(state.coriolisEnabled));
     safeSetStorage("firingDirectionDeg", String(state.firingDirectionDeg));
+    safeSetStorage("analyticsConsent", state.analyticsConsent);
     applyPreferences();
     render();
 }
@@ -686,6 +702,37 @@ function renderUpdateBanner() {
       </div>
     </div>
   `;
+}
+function renderAnalyticsConsentBanner() {
+    return "";
+}
+let analyticsLoaded = false;
+function loadGoogleAnalytics() {
+    if (analyticsLoaded)
+        return;
+    analyticsLoaded = true;
+    const win = window;
+    win.dataLayer = win.dataLayer ?? [];
+    win.gtag = function gtag(...args) {
+        win.dataLayer?.push(args);
+    };
+    win.gtag("js", new Date());
+    win.gtag("config", GA_MEASUREMENT_ID, {
+        transport_type: "beacon",
+        anonymize_ip: true
+    });
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_MEASUREMENT_ID)}`;
+    script.onerror = () => console.warn("Google Analytics failed to load");
+    document.head.appendChild(script);
+}
+function handleAnalyticsConsent(consent) {
+    if (consent === "unknown")
+        return;
+    setState({ analyticsConsent: consent });
+    if (consent === "accepted")
+        loadGoogleAnalytics();
 }
 function renderPreferenceBar() {
     const langButtons = ["sv", "en"].map(language => `
@@ -1123,6 +1170,7 @@ function render() {
     appRoot.innerHTML = `
     <div class="shell" style="--accent:${caliber.color};--glow:${caliber.glow}">
       ${renderUpdateBanner()}
+      ${renderAnalyticsConsentBanner()}
       ${renderPreferenceBar()}
       <header class="hero">
         <div class="hero-copy">
@@ -1418,6 +1466,7 @@ function renderFatalError(error) {
 try {
     applyPreferences();
     render();
+    loadGoogleAnalytics();
     window.addEventListener("load", () => {
         requestLocalWeather();
         registerServiceWorker();

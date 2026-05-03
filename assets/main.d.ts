@@ -86,6 +86,11 @@ declare const I18N: {
         readonly updateReadyText: "Sidan har hämtat en ny version. Ladda om för att använda senaste data och kod.";
         readonly updateReload: "Ladda om";
         readonly updateLater: "Senare";
+        readonly analyticsTitle: "Integritet / Analytics";
+        readonly analyticsText: "Vi använder Google Analytics endast om du accepterar. Det hjälper oss förstå användning och förbättra datakvalitet/funktioner. Valet sparas lokalt på din enhet.";
+        readonly analyticsAccept: "Acceptera analytics";
+        readonly analyticsDecline: "Avvisa";
+        readonly analyticsPrivacy: "Ingen analytics laddas förrän du accepterar.";
         readonly advanced: "AVANCERAT";
         readonly twistStability: "Räffelstigning / stabilitet";
         readonly twistRate: "Räffelstigning";
@@ -196,6 +201,11 @@ declare const I18N: {
         readonly updateReadyText: "The page has downloaded a new version. Reload to use the latest data and code.";
         readonly updateReload: "Reload";
         readonly updateLater: "Later";
+        readonly analyticsTitle: "Privacy / Analytics";
+        readonly analyticsText: "We use Google Analytics only if you accept. It helps us understand usage and improve data quality/features. The choice is stored locally on your device.";
+        readonly analyticsAccept: "Accept analytics";
+        readonly analyticsDecline: "Decline";
+        readonly analyticsPrivacy: "No analytics is loaded until you accept.";
         readonly advanced: "ADVANCED";
         readonly twistStability: "Twist / stability";
         readonly twistRate: "Twist rate";
@@ -227,6 +237,7 @@ type ThemeMode = "light" | "dark" | "system";
 type UnitSystem = "metric" | "imperial";
 type WindOptionId = "no" | "half" | "full";
 type WeatherStatus = "idle" | "loading" | "ready" | "denied" | "unavailable" | "error";
+type AnalyticsConsent = "unknown" | "accepted" | "declined";
 type State = {
     language: Language;
     unitSystem: UnitSystem;
@@ -250,13 +261,14 @@ type State = {
     weatherStatus: WeatherStatus;
     weatherMessage: string | null;
     updateReady: boolean;
+    analyticsConsent: AnalyticsConsent;
 };
 type BarrelCalculation = {
     barrel: BarrelVelocityPoint;
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.9";
+export declare const __appVersion = "1.4.11";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;

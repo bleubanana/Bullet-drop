@@ -1,4 +1,4 @@
-const CACHE = "bulletdrop-v1.4.9";
+const CACHE = "bulletdrop-v1.4.11";
 const SCOPE = self.registration.scope;
 const ASSETS = ["./", "./index.html", "./assets/main.js", "./assets/styles.css", "./manifest.json"]
   .map(path => new URL(path, SCOPE).toString());
