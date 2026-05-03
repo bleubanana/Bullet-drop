@@ -20,7 +20,7 @@ import {
 } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
 
-const APP_VERSION = "1.4.8";
+const APP_VERSION = "1.4.9";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300] as const;
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200] as const;
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -123,6 +123,7 @@ const I18N = {
     stabilityStable: "Stabil",
     stabilityHigh: "Hög stabilitet",
     stabilityNote: "Miller SG är en stabilitetsindikator, inte en träffbildskalkyl. Drop-tabellen antar stabil kula och publicerad BC.",
+    stabilityUnavailable: "Stabilitet kunde inte beräknas. Ange positiv räffelstigning och kullängd.",
     estimatedBulletLength: "Kullängd är uppskattad/editabel tills källspårad längd finns.",
     coriolis: "Coriolis / skjutriktning",
     enableCoriolis: "Visa Coriolis",
@@ -232,6 +233,7 @@ const I18N = {
     stabilityStable: "Stable",
     stabilityHigh: "High stability",
     stabilityNote: "Miller SG is a stability indicator, not an accuracy calculator. The drop table assumes a stable bullet and published BC.",
+    stabilityUnavailable: "Stability could not be calculated. Enter positive twist rate and bullet length.",
     estimatedBulletLength: "Bullet length is estimated/editable until source-tracked length is available.",
     coriolis: "Coriolis / direction of fire",
     enableCoriolis: "Show Coriolis",
@@ -354,8 +356,22 @@ function readUnitSystem(): UnitSystem {
 
 
 function readNumber(key: string, fallback: number): number {
-  const stored = Number(safeGetStorage(key));
+  const raw = safeGetStorage(key);
+  if (raw === null || raw.trim() === "") return fallback;
+  const stored = Number(raw);
   return Number.isFinite(stored) ? stored : fallback;
+}
+
+function positiveNumber(value: number, fallback: number): number {
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function normalizedTwistIn(caliberId: string, value: number): number {
+  return positiveNumber(value, defaultTwistIn(caliberId));
+}
+
+function normalizedBulletLengthIn(load: AmmunitionLoad, value: number): number {
+  return positiveNumber(value, estimatedBulletLengthIn(load));
 }
 
 function bulletDiameterIn(caliberId: string): number {
@@ -432,7 +448,7 @@ const state: State = {
   windDirectionDeg: null,
   latitudeDeg: null,
   windOptionId: "full",
-  twistInPerTurn: readNumber("twistIn:22lr", defaultTwistIn("22lr")),
+  twistInPerTurn: normalizedTwistIn("22lr", readNumber("twistIn:22lr", defaultTwistIn("22lr"))),
   bulletLengthIn: estimatedBulletLengthIn(ammunitionById("cci-standard-velocity-35")),
   coriolisEnabled: safeGetStorage("coriolisEnabled") === "true",
   firingDirectionDeg: readNumber("firingDirectionDeg", 90),
@@ -473,11 +489,13 @@ function setState(patch: Partial<State>): void {
     state.loadId = loads[0]?.id ?? AMMUNITION[0]?.id ?? "";
   }
   if (state.caliberId !== previousCaliber) {
-    state.twistInPerTurn = readNumber(`twistIn:${state.caliberId}`, defaultTwistIn(state.caliberId));
+    state.twistInPerTurn = normalizedTwistIn(state.caliberId, readNumber(`twistIn:${state.caliberId}`, defaultTwistIn(state.caliberId)));
     state.bulletLengthIn = estimatedBulletLengthIn(currentLoadOrFallback());
   } else if (state.loadId !== previousLoad && patch.bulletLengthIn === undefined) {
     state.bulletLengthIn = estimatedBulletLengthIn(currentLoadOrFallback());
   }
+  state.twistInPerTurn = normalizedTwistIn(state.caliberId, state.twistInPerTurn);
+  state.bulletLengthIn = normalizedBulletLengthIn(currentLoadOrFallback(), state.bulletLengthIn);
   safeSetStorage("language", state.language);
   safeSetStorage("themeMode", state.themeMode);
   safeSetStorage("unitSystem", state.unitSystem);
@@ -928,15 +946,28 @@ function renderWindTable(calculations: BarrelCalculation[]): string {
 function renderStabilityPanel(load: AmmunitionLoad, calculations: BarrelCalculation[]): string {
   const firstBarrel = calculations[0]?.barrel;
   if (!firstBarrel) return "";
-  const result = calculateMillerStability({
-    bulletWeightGr: load.bulletWeightGr,
-    bulletDiameterIn: bulletDiameterIn(load.caliberId),
-    bulletLengthIn: state.bulletLengthIn,
-    twistInPerTurn: state.twistInPerTurn,
-    muzzleVelocityMs: fpsToMs(firstBarrel.velocityFps),
-    temperatureC: state.temperatureC,
-    pressureHPa: state.pressureHPa
-  });
+  const safeTwist = normalizedTwistIn(load.caliberId, state.twistInPerTurn);
+  const safeBulletLength = normalizedBulletLengthIn(load, state.bulletLengthIn);
+  let resultHtml = `<p class="advanced-note warning">${t("stabilityUnavailable")}</p>`;
+  try {
+    const result = calculateMillerStability({
+      bulletWeightGr: load.bulletWeightGr,
+      bulletDiameterIn: bulletDiameterIn(load.caliberId),
+      bulletLengthIn: safeBulletLength,
+      twistInPerTurn: safeTwist,
+      muzzleVelocityMs: fpsToMs(firstBarrel.velocityFps),
+      temperatureC: state.temperatureC,
+      pressureHPa: state.pressureHPa
+    });
+    resultHtml = `
+      <div class="stability-result ${stabilityClass(result.status)}">
+        <div><span>${t("stabilityFactor")}</span><strong>${result.sg.toFixed(2)}</strong><em>${stabilityLabel(result.status)}</em></div>
+        <div><span>${t("spinRpm")}</span><strong>${Math.round(result.rpm / 1000)}k</strong><em>rpm</em></div>
+      </div>`;
+  } catch {
+    resultHtml = `<p class="advanced-note warning">${t("stabilityUnavailable")}</p>`;
+  }
+
   return `
     <section class="panel advanced-panel stability-panel">
       <div class="panel-head compact">
@@ -946,13 +977,10 @@ function renderStabilityPanel(load: AmmunitionLoad, calculations: BarrelCalculat
         </div>
       </div>
       <div class="advanced-controls">
-        ${renderNumberControl(t("twistRate"), "twistInput", state.twistInPerTurn.toFixed(2), 4, 30, 0.25, '1:x"')}
-        ${renderNumberControl(t("bulletLength"), "bulletLengthInput", state.bulletLengthIn.toFixed(3), 0.2, 2.2, 0.005, 'in')}
+        ${renderNumberControl(t("twistRate"), "twistInput", safeTwist.toFixed(2), 4, 30, 0.25, '1:x"')}
+        ${renderNumberControl(t("bulletLength"), "bulletLengthInput", safeBulletLength.toFixed(3), 0.2, 2.2, 0.005, 'in')}
       </div>
-      <div class="stability-result ${stabilityClass(result.status)}">
-        <div><span>${t("stabilityFactor")}</span><strong>${result.sg.toFixed(2)}</strong><em>${stabilityLabel(result.status)}</em></div>
-        <div><span>${t("spinRpm")}</span><strong>${Math.round(result.rpm / 1000)}k</strong><em>rpm</em></div>
-      </div>
+      ${resultHtml}
       <p class="advanced-note">${t("estimatedBulletLength")}</p>
     </section>
   `;

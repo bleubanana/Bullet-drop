@@ -46,7 +46,7 @@ The app also calls `registration.update()` on load and then once per hour while 
 Added mobile containment rules so wide ballistic tables scroll inside their cards instead of widening the whole page. Preference groups, caliber tabs and preset chip rows are horizontally scrollable on small screens. Long source titles and footer text now wrap safely.
 
 
-## v1.4.8 — Location wind and iPhone web app support
+## v1.4.9 — Location wind and iPhone web app support
 
 - Local weather now requests `wind_speed_10m` and `wind_direction_10m` from Open-Meteo in addition to temperature and surface pressure.
 - The wind speed field is pre-filled from local weather when permission is granted.
@@ -55,6 +55,6 @@ Added mobile containment rules so wide ballistic tables scroll inside their card
 - iOS web app meta tags and Apple touch icons are included for Safari Add to Home Screen installation.
 
 
-## v1.4.8 — Twist stability and Coriolis
+## v1.4.9 — Twist stability and Coriolis
 
 Adds an advanced Miller SG stability indicator using twist rate, bullet length, MV, temperature and pressure. Adds optional Coriolis correction with latitude and direction of fire. Coriolis is shown as a separate correction table and is disabled by default to avoid implying false precision for normal short-range use.

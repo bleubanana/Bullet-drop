@@ -98,6 +98,7 @@ declare const I18N: {
         readonly stabilityStable: "Stabil";
         readonly stabilityHigh: "Hög stabilitet";
         readonly stabilityNote: "Miller SG är en stabilitetsindikator, inte en träffbildskalkyl. Drop-tabellen antar stabil kula och publicerad BC.";
+        readonly stabilityUnavailable: "Stabilitet kunde inte beräknas. Ange positiv räffelstigning och kullängd.";
         readonly estimatedBulletLength: "Kullängd är uppskattad/editabel tills källspårad längd finns.";
         readonly coriolis: "Coriolis / skjutriktning";
         readonly enableCoriolis: "Visa Coriolis";
@@ -207,6 +208,7 @@ declare const I18N: {
         readonly stabilityStable: "Stable";
         readonly stabilityHigh: "High stability";
         readonly stabilityNote: "Miller SG is a stability indicator, not an accuracy calculator. The drop table assumes a stable bullet and published BC.";
+        readonly stabilityUnavailable: "Stability could not be calculated. Enter positive twist rate and bullet length.";
         readonly estimatedBulletLength: "Bullet length is estimated/editable until source-tracked length is available.";
         readonly coriolis: "Coriolis / direction of fire";
         readonly enableCoriolis: "Show Coriolis";
@@ -254,7 +256,7 @@ type BarrelCalculation = {
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.8";
+export declare const __appVersion = "1.4.9";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;
