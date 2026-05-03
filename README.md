@@ -2,7 +2,7 @@
 
 Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 
-## Vad som ändrats i v1.4.7
+## Vad som ändrats i v1.4.8
 
 - Ballistikmotorn är separerad från UI:t.
 - Ammunitionsdata ligger i en källspårad datamodell.
@@ -57,3 +57,8 @@ Datamodellen skiljer på:
 - `legacy-estimate`
 
 Härledda rader finns kvar för kontinuitet men visas tydligt med lägre datakvalitet.
+
+
+## v1.4.8 — Twist stability and Coriolis
+
+Adds an advanced Miller SG stability indicator using twist rate, bullet length, MV, temperature and pressure. Adds optional Coriolis correction with latitude and direction of fire. Coriolis is shown as a separate correction table and is disabled by default to avoid implying false precision for normal short-range use.

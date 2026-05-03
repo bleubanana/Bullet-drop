@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { calculateAtmosphere } from "../assets/core/atmosphere.js";
+import { calculateCoriolisCorrection } from "../assets/core/coriolis.js";
+import { calculateMillerStability } from "../assets/core/stability.js";
 import { calculateTrajectory } from "../assets/core/trajectory.js";
 import { cmToInch, cmToMoa, cmToMrad, fpsToMs, hPaToInHg, inHgToHPa, mToYard, mphToMs, msToFps, msToMph, yardToM } from "../assets/core/units.js";
 import { AMMUNITION, ammunitionById, BARREL_PROFILES, CALIBERS, profileByLoadId, SOURCES } from "../assets/data/index.js";
@@ -54,6 +56,31 @@ function testTrajectoryZeroing() {
   assert.ok(byDistance[100].timeOfFlightS > byDistance[50].timeOfFlightS, "TOF grows with distance");
 }
 
+
+function testStability() {
+  const result = calculateMillerStability({
+    bulletWeightGr: 77,
+    bulletDiameterIn: 0.224,
+    bulletLengthIn: 0.99,
+    twistInPerTurn: 8,
+    muzzleVelocityMs: fpsToMs(2800),
+    temperatureC: 15,
+    pressureHPa: 1013.25
+  });
+  assert.ok(result.sg > 1.3, "77 gr .223 in 1:8 should be at least acceptably stable by Miller estimate");
+  assert.ok(result.rpm > 200000, "RPM should be plausible for 2800 fps in 1:8 twist");
+}
+
+function testCoriolis() {
+  const east = calculateCoriolisCorrection({ distanceM: 1000, timeOfFlightS: 1.5, latitudeDeg: 60, directionOfFireDeg: 90 });
+  const west = calculateCoriolisCorrection({ distanceM: 1000, timeOfFlightS: 1.5, latitudeDeg: 60, directionOfFireDeg: 270 });
+  const north = calculateCoriolisCorrection({ distanceM: 1000, timeOfFlightS: 1.5, latitudeDeg: 60, directionOfFireDeg: 0 });
+  assert.ok(east.horizontalRightCm > 0, "Northern hemisphere Coriolis should be right-positive");
+  assert.ok(east.verticalCm > 0, "East shot should be high-positive");
+  assert.ok(west.verticalCm < 0, "West shot should be low-negative");
+  approx(north.verticalCm, 0, 0.1, "North shot has near-zero vertical Eotvos component");
+}
+
 function testDataIntegrity() {
   const sourceIds = new Set(SOURCES.map(source => source.id));
   assert.equal(sourceIds.size, SOURCES.length, "Source IDs must be unique");
@@ -90,7 +117,7 @@ function testDataIntegrity() {
   }
 }
 
-for (const test of [testUnits, testAtmosphere, testTrajectoryZeroing, testDataIntegrity]) {
+for (const test of [testUnits, testAtmosphere, testTrajectoryZeroing, testStability, testCoriolis, testDataIntegrity]) {
   test();
   console.log(`OK ${test.name}`);
 }

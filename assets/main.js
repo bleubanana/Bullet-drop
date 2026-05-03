@@ -1,8 +1,10 @@
 import { calculateAtmosphere } from "./core/atmosphere.js";
+import { calculateCoriolisCorrection } from "./core/coriolis.js";
+import { calculateMillerStability } from "./core/stability.js";
 import { calculateTrajectory } from "./core/trajectory.js";
 import { cmToInch, fpsToMs, formatSigned, hPaToInHg, inHgToHPa, inchToCm, kgM3ToLbFt3, mToYard, mphToMs, msToFps, msToMph, roundTo, yardToM } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
-const APP_VERSION = "1.4.7";
+const APP_VERSION = "1.4.8";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300];
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200];
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
@@ -91,7 +93,30 @@ const I18N = {
         updateReadyTitle: "Ny version finns",
         updateReadyText: "Sidan har hämtat en ny version. Ladda om för att använda senaste data och kod.",
         updateReload: "Ladda om",
-        updateLater: "Senare"
+        updateLater: "Senare",
+        advanced: "AVANCERAT",
+        twistStability: "Räffelstigning / stabilitet",
+        twistRate: "Räffelstigning",
+        bulletLength: "Kullängd",
+        stabilityFactor: "SG",
+        spinRpm: "Spinn",
+        stabilityUnstable: "Instabil",
+        stabilityMarginal: "Marginal",
+        stabilityAcceptable: "Acceptabel",
+        stabilityStable: "Stabil",
+        stabilityHigh: "Hög stabilitet",
+        stabilityNote: "Miller SG är en stabilitetsindikator, inte en träffbildskalkyl. Drop-tabellen antar stabil kula och publicerad BC.",
+        estimatedBulletLength: "Kullängd är uppskattad/editabel tills källspårad längd finns.",
+        coriolis: "Coriolis / skjutriktning",
+        enableCoriolis: "Visa Coriolis",
+        latitude: "Latitud",
+        firingDirection: "Skjutriktning",
+        firingDirectionNote: "0° = norr, 90° = öst, 180° = syd, 270° = väst.",
+        coriolisCorrection: "■ CORIOLIS",
+        coriolisHelp: "Approximation från jordrotation. Horisontellt visas positivt som höger; vertikalt positivt som hög träff.",
+        horizontalRight: "Höger",
+        vertical: "Vertikal",
+        noLatitude: "Latitud saknas — hämta platsväder eller ange manuellt."
     },
     en: {
         appEyebrow: "SOURCE-TRACKED BALLISTICS",
@@ -177,7 +202,30 @@ const I18N = {
         updateReadyTitle: "New version available",
         updateReadyText: "The page has downloaded a new version. Reload to use the latest data and code.",
         updateReload: "Reload",
-        updateLater: "Later"
+        updateLater: "Later",
+        advanced: "ADVANCED",
+        twistStability: "Twist / stability",
+        twistRate: "Twist rate",
+        bulletLength: "Bullet length",
+        stabilityFactor: "SG",
+        spinRpm: "Spin",
+        stabilityUnstable: "Unstable",
+        stabilityMarginal: "Marginal",
+        stabilityAcceptable: "Acceptable",
+        stabilityStable: "Stable",
+        stabilityHigh: "High stability",
+        stabilityNote: "Miller SG is a stability indicator, not an accuracy calculator. The drop table assumes a stable bullet and published BC.",
+        estimatedBulletLength: "Bullet length is estimated/editable until source-tracked length is available.",
+        coriolis: "Coriolis / direction of fire",
+        enableCoriolis: "Show Coriolis",
+        latitude: "Latitude",
+        firingDirection: "Direction of fire",
+        firingDirectionNote: "0° = north, 90° = east, 180° = south, 270° = west.",
+        coriolisCorrection: "■ CORIOLIS",
+        coriolisHelp: "Earth-rotation approximation. Horizontal is positive right; vertical is positive high.",
+        horizontalRight: "Right",
+        vertical: "Vertical",
+        noLatitude: "Latitude missing — load local weather or enter it manually."
     }
 };
 const WIND_OPTIONS = [
@@ -229,6 +277,76 @@ function readUnitSystem() {
     const stored = safeGetStorage("unitSystem");
     return stored === "imperial" || stored === "metric" ? stored : "metric";
 }
+function readNumber(key, fallback) {
+    const stored = Number(safeGetStorage(key));
+    return Number.isFinite(stored) ? stored : fallback;
+}
+function bulletDiameterIn(caliberId) {
+    switch (caliberId) {
+        case "22lr": return 0.223;
+        case "9x19": return 0.355;
+        case "223rem": return 0.224;
+        case "308win": return 0.308;
+        case "65cm": return 0.264;
+        default: return 0.308;
+    }
+}
+function defaultTwistIn(caliberId) {
+    switch (caliberId) {
+        case "22lr": return 16;
+        case "9x19": return 10;
+        case "223rem": return 8;
+        case "308win": return 12;
+        case "65cm": return 8;
+        default: return 10;
+    }
+}
+function estimatedBulletLengthIn(load) {
+    const w = load.bulletWeightGr;
+    switch (load.caliberId) {
+        case "22lr":
+            if (w >= 58)
+                return 0.75;
+            if (w >= 45)
+                return 0.55;
+            if (w <= 33)
+                return 0.40;
+            return 0.47;
+        case "9x19":
+            if (w >= 150)
+                return 0.72;
+            if (w >= 145)
+                return 0.68;
+            if (w >= 123)
+                return 0.60;
+            return 0.55;
+        case "223rem":
+            if (w >= 75)
+                return 0.99;
+            if (w >= 62)
+                return 0.91;
+            return 0.74;
+        case "65cm":
+            if (w >= 145)
+                return 1.43;
+            if (w >= 139)
+                return 1.35;
+            return 1.22;
+        case "308win":
+            if (w >= 178)
+                return 1.34;
+            if (w >= 174)
+                return 1.30;
+            if (w >= 165)
+                return 1.26;
+            return 1.10;
+        default:
+            return 1.00;
+    }
+}
+function currentLoadOrFallback() {
+    return ammunitionById(state.loadId || AMMUNITION[0].id);
+}
 const initialUnitSystem = readUnitSystem();
 const state = {
     language: readLanguage(),
@@ -243,7 +361,12 @@ const state = {
     pressureHPa: 1013.25,
     windSpeedMs: 0,
     windDirectionDeg: null,
+    latitudeDeg: null,
     windOptionId: "full",
+    twistInPerTurn: readNumber("twistIn:22lr", defaultTwistIn("22lr")),
+    bulletLengthIn: estimatedBulletLengthIn(ammunitionById("cci-standard-velocity-35")),
+    coriolisEnabled: safeGetStorage("coriolisEnabled") === "true",
+    firingDirectionDeg: readNumber("firingDirectionDeg", 90),
     showAngular: false,
     weatherStatus: "idle",
     weatherMessage: null,
@@ -270,14 +393,26 @@ function t(key) {
     return I18N[state.language][key];
 }
 function setState(patch) {
+    const previousCaliber = state.caliberId;
+    const previousLoad = state.loadId;
     Object.assign(state, patch);
     const loads = ammunitionForCaliber(state.caliberId);
     if (!loads.some(load => load.id === state.loadId)) {
         state.loadId = loads[0]?.id ?? AMMUNITION[0]?.id ?? "";
     }
+    if (state.caliberId !== previousCaliber) {
+        state.twistInPerTurn = readNumber(`twistIn:${state.caliberId}`, defaultTwistIn(state.caliberId));
+        state.bulletLengthIn = estimatedBulletLengthIn(currentLoadOrFallback());
+    }
+    else if (state.loadId !== previousLoad && patch.bulletLengthIn === undefined) {
+        state.bulletLengthIn = estimatedBulletLengthIn(currentLoadOrFallback());
+    }
     safeSetStorage("language", state.language);
     safeSetStorage("themeMode", state.themeMode);
     safeSetStorage("unitSystem", state.unitSystem);
+    safeSetStorage(`twistIn:${state.caliberId}`, String(state.twistInPerTurn));
+    safeSetStorage("coriolisEnabled", String(state.coriolisEnabled));
+    safeSetStorage("firingDirectionDeg", String(state.firingDirectionDeg));
     applyPreferences();
     render();
 }
@@ -429,6 +564,23 @@ function formatSoundSpeed(valueMs) {
     if (state.unitSystem === "imperial")
         return `${Math.round(msToFps(valueMs))} ft/s`;
     return `${Math.round(valueMs)} m/s`;
+}
+function formatDistanceCm(valueCm) {
+    if (state.unitSystem === "imperial")
+        return `${formatSigned(cmToInch(valueCm), 2)} in`;
+    return `${formatSigned(valueCm, 1)} cm`;
+}
+function stabilityLabel(status) {
+    switch (status) {
+        case "unstable": return t("stabilityUnstable");
+        case "marginal": return t("stabilityMarginal");
+        case "acceptable": return t("stabilityAcceptable");
+        case "stable": return t("stabilityStable");
+        case "high": return t("stabilityHigh");
+    }
+}
+function stabilityClass(status) {
+    return `stability-${status}`;
 }
 function formatLinearDrop(dropCm) {
     if (state.unitSystem === "imperial")
@@ -681,6 +833,110 @@ function renderWindTable(calculations) {
     </section>
   `;
 }
+function renderStabilityPanel(load, calculations) {
+    const firstBarrel = calculations[0]?.barrel;
+    if (!firstBarrel)
+        return "";
+    const result = calculateMillerStability({
+        bulletWeightGr: load.bulletWeightGr,
+        bulletDiameterIn: bulletDiameterIn(load.caliberId),
+        bulletLengthIn: state.bulletLengthIn,
+        twistInPerTurn: state.twistInPerTurn,
+        muzzleVelocityMs: fpsToMs(firstBarrel.velocityFps),
+        temperatureC: state.temperatureC,
+        pressureHPa: state.pressureHPa
+    });
+    return `
+    <section class="panel advanced-panel stability-panel">
+      <div class="panel-head compact">
+        <div>
+          <h2>${t("twistStability")}</h2>
+          <p>${t("stabilityNote")}</p>
+        </div>
+      </div>
+      <div class="advanced-controls">
+        ${renderNumberControl(t("twistRate"), "twistInput", state.twistInPerTurn.toFixed(2), 4, 30, 0.25, '1:x"')}
+        ${renderNumberControl(t("bulletLength"), "bulletLengthInput", state.bulletLengthIn.toFixed(3), 0.2, 2.2, 0.005, 'in')}
+      </div>
+      <div class="stability-result ${stabilityClass(result.status)}">
+        <div><span>${t("stabilityFactor")}</span><strong>${result.sg.toFixed(2)}</strong><em>${stabilityLabel(result.status)}</em></div>
+        <div><span>${t("spinRpm")}</span><strong>${Math.round(result.rpm / 1000)}k</strong><em>rpm</em></div>
+      </div>
+      <p class="advanced-note">${t("estimatedBulletLength")}</p>
+    </section>
+  `;
+}
+function renderCoriolisControls() {
+    const latitudeValue = state.latitudeDeg === null ? "" : state.latitudeDeg.toFixed(3);
+    return `
+    <section class="panel advanced-panel coriolis-panel">
+      <div class="panel-head compact">
+        <div>
+          <h2>${t("coriolis")}</h2>
+          <p>${t("firingDirectionNote")}</p>
+        </div>
+      </div>
+      <label class="check-row">
+        <input id="coriolisEnabled" type="checkbox" ${state.coriolisEnabled ? "checked" : ""} />
+        <span>${t("enableCoriolis")}</span>
+      </label>
+      <div class="advanced-controls">
+        <label class="control">
+          <span>${t("latitude")}</span>
+          <div class="number-row">
+            <input id="latitudeInput" type="number" value="${latitudeValue}" min="-90" max="90" step="0.001" placeholder="—" />
+            <em>°</em>
+          </div>
+        </label>
+        ${renderNumberControl(t("firingDirection"), "firingDirectionInput", state.firingDirectionDeg.toFixed(0), 0, 359, 1, `° ${compassDirection(state.firingDirectionDeg)}`)}
+      </div>
+      ${state.latitudeDeg === null ? `<p class="advanced-note warning-note">${t("noLatitude")}</p>` : ""}
+    </section>
+  `;
+}
+function renderCoriolisTable(calculations) {
+    if (!state.coriolisEnabled || state.latitudeDeg === null)
+        return "";
+    const marks = distanceMarks();
+    return `
+    <section class="panel table-panel coriolis-results-panel">
+      <div class="panel-head compact">
+        <div>
+          <h2>${t("coriolisCorrection")}</h2>
+          <p>${t("coriolisHelp")} ${t("latitude")}: ${state.latitudeDeg.toFixed(3)}° · ${t("firingDirection")}: ${Math.round(state.firingDirectionDeg)}° ${compassDirection(state.firingDirectionDeg)}.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>${t("barrel")}</th>
+              <th>MV</th>
+              ${marks.map(mark => `<th>${mark.label}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${calculations.map(calc => `
+              <tr>
+                <td class="barrel">${formatBarrelLengthHtml(calc.barrel.barrelLengthIn)}</td>
+                <td>${formatVelocityTextFromFps(calc.barrel.velocityFps)}</td>
+                ${calc.points.map(point => {
+        const correction = calculateCoriolisCorrection({
+            distanceM: point.distanceM,
+            timeOfFlightS: point.timeOfFlightS,
+            latitudeDeg: state.latitudeDeg ?? 0,
+            directionOfFireDeg: state.firingDirectionDeg
+        });
+        return `<td><strong>${formatDistanceCm(correction.horizontalRightCm)}</strong><small>${t("horizontalRight")}</small><strong>${formatDistanceCm(correction.verticalCm)}</strong><small>${t("vertical")}</small></td>`;
+    }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
 function renderSourceLink(sourceId) {
     const source = sourceById(sourceId);
     if (!source)
@@ -897,11 +1153,14 @@ function render() {
         <div class="stack">
           ${renderDropTable(caliber.color, calculations)}
           ${renderWindTable(calculations)}
+          ${renderCoriolisTable(calculations)}
           ${renderMuzzleVelocityPanel(load)}
           ${renderCribCard(load, calculations, caliber.color)}
         </div>
         <div id="audit" class="stack side-stack">
           ${renderDataAudit(load)}
+          ${renderStabilityPanel(load, calculations)}
+          ${renderCoriolisControls()}
           <section class="panel notes-panel">
             <h2>${t("notes")}</h2>
             <ul>
@@ -977,6 +1236,31 @@ function bindEvents() {
         const value = Number(windInput.value);
         setState({ windSpeedMs: state.unitSystem === "imperial" ? mphToMs(value) : value, weatherStatus: "idle", weatherMessage: null, windDirectionDeg: null });
     });
+    const twistInput = document.getElementById("twistInput");
+    twistInput?.addEventListener("change", () => {
+        const value = Number(twistInput.value);
+        if (Number.isFinite(value) && value > 0)
+            setState({ twistInPerTurn: value });
+    });
+    const bulletLengthInput = document.getElementById("bulletLengthInput");
+    bulletLengthInput?.addEventListener("change", () => {
+        const value = Number(bulletLengthInput.value);
+        if (Number.isFinite(value) && value > 0)
+            setState({ bulletLengthIn: value });
+    });
+    const coriolisEnabled = document.getElementById("coriolisEnabled");
+    coriolisEnabled?.addEventListener("change", () => setState({ coriolisEnabled: coriolisEnabled.checked }));
+    const latitudeInput = document.getElementById("latitudeInput");
+    latitudeInput?.addEventListener("change", () => {
+        const value = Number(latitudeInput.value);
+        setState({ latitudeDeg: Number.isFinite(value) ? Math.max(-90, Math.min(90, value)) : null });
+    });
+    const firingDirectionInput = document.getElementById("firingDirectionInput");
+    firingDirectionInput?.addEventListener("change", () => {
+        const value = Number(firingDirectionInput.value);
+        if (Number.isFinite(value))
+            setState({ firingDirectionDeg: ((value % 360) + 360) % 360 });
+    });
     document.getElementById("toggleUnits")?.addEventListener("click", () => setState({ showAngular: !state.showAngular }));
     document.getElementById("printCrib")?.addEventListener("click", () => window.print());
     document.getElementById("weatherButton")?.addEventListener("click", () => requestLocalWeather());
@@ -1027,6 +1311,7 @@ async function fetchLocalWeather(position, requestId) {
             pressureHPa: roundTo(pressure, 0),
             windSpeedMs: typeof windSpeed === "number" ? roundTo(windSpeed, 1) : state.windSpeedMs,
             windDirectionDeg: typeof windDirection === "number" ? roundTo(windDirection, 0) : null,
+            latitudeDeg: roundTo(position.coords.latitude, 4),
             weatherStatus: "ready",
             weatherMessage: weatherTime
         });
