@@ -189,7 +189,7 @@ type BarrelCalculation = {
     points: TrajectoryPoint[];
 };
 declare function calculateForSelectedLoad(): BarrelCalculation[];
-export declare const __appVersion = "1.4.3";
+export declare const __appVersion = "1.4.4";
 export declare const __defaultState: State;
 export declare const __calculateForSelectedLoad: typeof calculateForSelectedLoad;
 export declare const __msToFps: typeof msToFps;

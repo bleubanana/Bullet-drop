@@ -2,7 +2,7 @@
 
 Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 
-## Vad som ändrats i v1.4.3
+## Vad som ändrats i v1.4.4
 
 - Ballistikmotorn är separerad från UI:t.
 - Ammunitionsdata ligger i en källspårad datamodell.
@@ -15,6 +15,8 @@ Källspårad referensguide för kulfall, vindavdrift och ammunitionsdata.
 - Atmosfärsmodellen justerar både luftdensitet och ljudhastighet efter temperatur.
 - Vind visas som approximation via lag-regel, inte som full 3D-lösning.
 - Appen använder inte längre browser-Babel eller CDN-React.
+- Fler produktnivåreferenser har lagts till för .22 LR, 9×19, .223 Rem, .308 Win och 6.5 Creedmoor.
+- S&B-, GGG-, GECO-, CCI- och Aguila-rader har lagts till med `manufacturer-published` där värdena kunde verifieras.
 - En testsvit verifierar enheter, atmosfär, nollning och dataintegritet.
 
 ## Lokal körning

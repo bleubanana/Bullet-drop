@@ -18,7 +18,7 @@ import {
 } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
 
-const APP_VERSION = "1.4.3";
+const APP_VERSION = "1.4.4";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300] as const;
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200] as const;
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";

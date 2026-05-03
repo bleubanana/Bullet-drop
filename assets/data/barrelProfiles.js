@@ -198,6 +198,211 @@ export const BARREL_PROFILES = [
             { barrelLengthIn: 22, velocityFps: 2603, confidence: "derived", method: "derived", sourceRefs: ["hornady-65cm-147-tap", "rifleshooter-65cm-2019", "derived-barrel-note"] },
             { barrelLengthIn: 24, velocityFps: 2655, confidence: "manufacturer-published", method: "published", sourceRefs: ["hornady-65cm-147-tap"] }
         ]
+    },
+    {
+        loadId: "sb-22lr-club-sb22a",
+        notes: "S&B manufacturer nominal row plus conservative derived .22 LR barrel context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1000, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1070, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-22lr-2022-catalog"] },
+            { barrelLengthIn: 18, velocityFps: 1065, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1060, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-22lr-hv-sb22b",
+        notes: "S&B manufacturer nominal row plus conservative derived high-velocity .22 LR barrel context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1120, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1235, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-22lr-2022-catalog"] },
+            { barrelLengthIn: 18, velocityFps: 1225, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1215, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-22lr-subsonic-sb22sub",
+        notes: "S&B manufacturer nominal row plus conservative derived subsonic .22 LR barrel context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 960, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1020, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-22lr-2022-catalog"] },
+            { barrelLengthIn: 18, velocityFps: 1015, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 1010, confidence: "derived", method: "derived", sourceRefs: ["sb-22lr-2022-catalog", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "cci-quiet-semi-auto-975cc",
+        notes: "Manufacturer nominal velocity retained; shorter barrel rows are derived placeholders.",
+        points: [
+            { barrelLengthIn: 4, velocityFps: 760, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-quiet-semi-auto-975-page", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 835, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-2026-catalog", "cci-quiet-semi-auto-975-page"] }
+        ]
+    },
+    {
+        loadId: "cci-quiet-22-960",
+        notes: "Very low velocity manufacturer row. Long barrels may reduce velocity; use chronograph validation.",
+        points: [
+            { barrelLengthIn: 16, velocityFps: 710, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-2026-catalog", "cci-quiet-22-960-page"] }
+        ]
+    },
+    {
+        loadId: "cci-stinger-50",
+        notes: "Manufacturer nominal row plus derived context for hyper-velocity .22 LR.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1375, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-stinger-50-page", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1640, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-2026-catalog", "cci-stinger-50-page"] },
+            { barrelLengthIn: 20, velocityFps: 1650, confidence: "derived", method: "derived", sourceRefs: ["cci-2026-catalog", "cci-stinger-50-page", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "cci-suppressor-957",
+        notes: "Manufacturer/product references indicate 45 gr suppressor-class load around 970 fps.",
+        points: [
+            { barrelLengthIn: 16, velocityFps: 970, confidence: "manufacturer-published", method: "published", sourceRefs: ["cci-suppressor-957-page"] }
+        ]
+    },
+    {
+        loadId: "aguila-22-sss-60gr",
+        notes: "Aguila recommends 20 inch barrels or longer for this heavy 60 gr SSS load.",
+        points: [
+            { barrelLengthIn: 20, velocityFps: 950, confidence: "manufacturer-published", method: "published", sourceRefs: ["aguila-22-sss-page"] }
+        ]
+    },
+    {
+        loadId: "sb-9mm-115-fmj-v310452",
+        notes: "Manufacturer 150 mm test barrel row plus derived PCC-length context; not direct S&B PCC chronograph data.",
+        points: [
+            { barrelLengthIn: 5.9, velocityFps: 1279, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-9mm-115-fmj-290"] },
+            { barrelLengthIn: 10, velocityFps: 1375, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-115-fmj-290", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1410, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-115-fmj-290", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1400, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-115-fmj-290", "bbti-9mm", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-9mm-124-fmj-v310492",
+        notes: "Manufacturer 6 inch test barrel row plus derived PCC-length context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1181, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-9mm-124-fmj-289-pdf"] },
+            { barrelLengthIn: 10, velocityFps: 1245, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-124-fmj-289-pdf", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1275, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-124-fmj-289-pdf", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1265, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-124-fmj-289-pdf", "bbti-9mm", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-9mm-115-jhp-v310422",
+        notes: "Manufacturer MV row plus derived 9 mm barrel context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1237, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-9mm-jhp-list"] },
+            { barrelLengthIn: 16, velocityFps: 1340, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-jhp-list", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1325, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-jhp-list", "bbti-9mm", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-9mm-124-jhp-v312182",
+        notes: "Manufacturer MV row plus derived 9 mm barrel context.",
+        points: [
+            { barrelLengthIn: 6, velocityFps: 1201, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-9mm-jhp-list"] },
+            { barrelLengthIn: 16, velocityFps: 1290, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-jhp-list", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1278, confidence: "derived", method: "derived", sourceRefs: ["sb-9mm-jhp-list", "bbti-9mm", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "geco-9mm-fmjfn-154gr",
+        notes: "Placeholder heavy 9 mm FMJ-FN row; replace when GECO velocity/BC are verified from datasheet.",
+        points: [
+            { barrelLengthIn: 5.9, velocityFps: 984, confidence: "derived", method: "derived", sourceRefs: ["geco-9mm-fmjfn-154", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "geco-9mm-fmj-124gr-8g",
+        notes: "Manufacturer 125 mm barrel row plus derived PCC context.",
+        points: [
+            { barrelLengthIn: 4.9, velocityFps: 1181, confidence: "manufacturer-published", method: "published", sourceRefs: ["geco-9mm-fmj-124-8g"] },
+            { barrelLengthIn: 10, velocityFps: 1240, confidence: "derived", method: "derived", sourceRefs: ["geco-9mm-fmj-124-8g", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 16, velocityFps: 1270, confidence: "derived", method: "derived", sourceRefs: ["geco-9mm-fmj-124-8g", "bbti-9mm", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 1260, confidence: "derived", method: "derived", sourceRefs: ["geco-9mm-fmj-124-8g", "bbti-9mm", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-223-fmj-55-v341862",
+        notes: "Manufacturer 600 mm row plus derived shorter-barrel context from .223 cut-down data.",
+        points: [
+            { barrelLengthIn: 16, velocityFps: 3090, confidence: "derived", method: "derived", sourceRefs: ["sb-223-fmj-55-180", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 3260, confidence: "derived", method: "derived", sourceRefs: ["sb-223-fmj-55-180", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 23.6, velocityFps: 3301, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-223-fmj-55-180"] }
+        ]
+    },
+    {
+        loadId: "ggg-223-gpr12-62-fmj",
+        notes: "Manufacturer 508 mm / 20 inch point from GGG; no smoothing needed for that point.",
+        points: [
+            { barrelLengthIn: 16, velocityFps: 2990, confidence: "derived", method: "derived", sourceRefs: ["ggg-223-gpr12", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 3117, confidence: "manufacturer-published", method: "published", sourceRefs: ["ggg-223-gpr12"] }
+        ]
+    },
+    {
+        loadId: "ggg-223-gpr14-77-hpbt",
+        notes: "Manufacturer 600 mm point plus derived shorter-barrel context.",
+        points: [
+            { barrelLengthIn: 16, velocityFps: 2675, confidence: "derived", method: "derived", sourceRefs: ["ggg-223-gpr14", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2760, confidence: "derived", method: "derived", sourceRefs: ["ggg-223-gpr14", "rifleshooter-223-cutdown", "derived-barrel-note"] },
+            { barrelLengthIn: 23.6, velocityFps: 2805, confidence: "manufacturer-published", method: "published", sourceRefs: ["ggg-223-gpr14"] }
+        ]
+    },
+    {
+        loadId: "sb-65cm-fmjbt-140-v341602",
+        notes: "Manufacturer 550 mm point plus derived 18/20/24 inch context using 6.5 Creedmoor cut-down rates.",
+        points: [
+            { barrelLengthIn: 18, velocityFps: 2570, confidence: "derived", method: "derived", sourceRefs: ["sb-65cm-fmjbt-140-560", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2620, confidence: "derived", method: "derived", sourceRefs: ["sb-65cm-fmjbt-140-560", "rifleshooter-65cm-2019", "derived-barrel-note"] },
+            { barrelLengthIn: 21.7, velocityFps: 2657, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-65cm-fmjbt-140-560"] },
+            { barrelLengthIn: 24, velocityFps: 2715, confidence: "derived", method: "derived", sourceRefs: ["sb-65cm-fmjbt-140-560", "rifleshooter-65cm-2019", "derived-barrel-note"] }
+        ]
+    },
+    {
+        loadId: "sb-308-fmj-147-sb308a",
+        notes: "Manufacturer 23.5 inch point plus derived shorter .308 barrel context.",
+        points: [
+            { barrelLengthIn: 16.5, velocityFps: 2630, confidence: "derived", method: "derived", sourceRefs: ["sb-308-fmj-147-145", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 18, velocityFps: 2670, confidence: "derived", method: "derived", sourceRefs: ["sb-308-fmj-147-145", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2720, confidence: "derived", method: "derived", sourceRefs: ["sb-308-fmj-147-145", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 23.5, velocityFps: 2789, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-308-fmj-147-145"] }
+        ]
+    },
+    {
+        loadId: "sb-308-fmj-180-sb308b",
+        notes: "Manufacturer 600 mm point plus derived shorter .308 barrel context.",
+        points: [
+            { barrelLengthIn: 16.5, velocityFps: 2260, confidence: "derived", method: "derived", sourceRefs: ["sb-308-fmj-180-144", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2340, confidence: "derived", method: "derived", sourceRefs: ["sb-308-fmj-180-144", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 23.6, velocityFps: 2411, confidence: "manufacturer-published", method: "published", sourceRefs: ["sb-308-fmj-180-144"] }
+        ]
+    },
+    {
+        loadId: "ggg-308-gpx11-147-fmj",
+        notes: "Manufacturer 568 mm mean-velocity point; V0 table value differs, see source note.",
+        points: [
+            { barrelLengthIn: 16.5, velocityFps: 2580, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx11", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2665, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx11", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 22.36, velocityFps: 2700, confidence: "manufacturer-published", method: "published", sourceRefs: ["ggg-308-gpx11"] }
+        ]
+    },
+    {
+        loadId: "ggg-308-gpx14-165-sbt",
+        notes: "Manufacturer 600 mm point plus derived shorter .308 barrel context.",
+        points: [
+            { barrelLengthIn: 16.5, velocityFps: 2520, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx14", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2595, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx14", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 23.6, velocityFps: 2641, confidence: "manufacturer-published", method: "published", sourceRefs: ["ggg-308-gpx14"] }
+        ]
+    },
+    {
+        loadId: "ggg-308-gpx19-180-sbt",
+        notes: "Manufacturer 600 mm point plus derived shorter .308 barrel context.",
+        points: [
+            { barrelLengthIn: 16.5, velocityFps: 2440, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx19", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 20, velocityFps: 2510, confidence: "derived", method: "derived", sourceRefs: ["ggg-308-gpx19", "rifleshooter-308-summary", "derived-barrel-note"] },
+            { barrelLengthIn: 23.6, velocityFps: 2559, confidence: "manufacturer-published", method: "published", sourceRefs: ["ggg-308-gpx19"] }
+        ]
     }
 ];
 export function profileByLoadId(loadId) {

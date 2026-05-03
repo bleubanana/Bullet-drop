@@ -278,6 +278,223 @@ export const SOURCES: Source[] = [
     retrievedAt: "2026-05-02",
     notes: "Retailer-hosted component bullet specification used only as an interim BC check for the 140 gr 6.5 mm MatchKing class row."
   }
+  ,
+  {
+    id: "sb-223-fmj-55-180",
+    title: "223 REM FMJ 55 gr V341862 detail 180",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/rifle-ammunition/rifle-ammunition-fmj/detail/180/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 55 gr FMJ, V0 1006 m/s, G1 BC 0.259, G7 BC 0.127, and 600 mm test barrel."
+  },
+  {
+    id: "ggg-223-gpr12",
+    title: "GGG .223 REM DESIGN GPR12 product page",
+    publisher: "Giraites Ginkluotes Gamykla (GGG)",
+    url: "https://www.ggg-ammo.lt/en/civil-ammunition/ggg-223-rem-design-gpr12-en",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 62 gr FMJ, V0 950 m/s from 508 mm CIP test barrel, and BC 0.298."
+  },
+  {
+    id: "ggg-223-gpr14",
+    title: "GGG .223 REM DESIGN GPR14 product page",
+    publisher: "Giraites Ginkluotes Gamykla (GGG)",
+    url: "https://www.ggg-ammo.lt/en/civil-ammunition/ggg-223-rem-design-gpr14-en",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 77 gr HPBT, V0 855 m/s from 600 mm CIP test barrel, and BC 0.362."
+  },
+  {
+    id: "sb-65cm-fmjbt-140-560",
+    title: "6.5 Creedmoor FMJBT 140 gr detail 560 / catalog row",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/rifle-ammunition/rifle-ammunition-fmj/detail/560/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Sellier & Bellot catalog data lists 6.5 Creedmoor 140 gr FMJBT V341602, V0 810 m/s, G1 BC 0.491, G7 BC 0.247, and 550 mm test barrel."
+  },
+  {
+    id: "sb-308-fmj-147-145",
+    title: "308 WIN FMJ 147 gr SB308A detail 145",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellierbellot.us/products/rifle-ammunition/rifle-ammunition-fmj/detail/145/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 147 gr FMJ, 2789 fps, G1 BC 0.407, G7 BC 0.204, and 23.5 inch test barrel."
+  },
+  {
+    id: "sb-308-fmj-180-144",
+    title: "308 WIN FMJ 180 gr SB308B detail 144",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/rifle-ammunition/rifle-ammunition-fmj/detail/144/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 180 gr FMJ, V0 735 m/s, G1 BC 0.498, G7 BC 0.250, and 600 mm test barrel."
+  },
+  {
+    id: "ggg-308-gpx11",
+    title: "GGG .308 WIN DESIGN GPX11 product page",
+    publisher: "Giraites Ginkluotes Gamykla (GGG)",
+    url: "https://www.ggg-ammo.lt/en/civil-ammunition/ggg-308-win-design-gpx11-en",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 147 gr FMJ, 823 m/s mean velocity from 568 mm CIP test barrel; the published range table also lists V0 842 m/s and BC 0.401."
+  },
+  {
+    id: "ggg-308-gpx14",
+    title: "GGG .308 WIN DESIGN GPX14 FOR HUNTING product page",
+    publisher: "Giraites Ginkluotes Gamykla (GGG)",
+    url: "https://www.ggg-ammo.lt/en/civil-ammunition/ggg-308-win-design-gpx14-for-hunting-en",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 165 gr SBT, V0 805 m/s from 600 mm CIP test barrel, and BC 0.404."
+  },
+  {
+    id: "ggg-308-gpx19",
+    title: "GGG .308 WIN DESIGN GPX19 FOR HUNTING product page",
+    publisher: "Giraites Ginkluotes Gamykla (GGG)",
+    url: "https://www.ggg-ammo.lt/en/civil-ammunition/ggg-308-win-dizainas-gpx19-for-hunting-en",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 180 gr SBT, V0 780 m/s from 600 mm CIP test barrel, and BC 0.506."
+  },
+  {
+    id: "sb-22lr-2022-catalog",
+    title: "Sellier & Bellot 2022 product annual, .22 LR rimfire table",
+    publisher: "Sellier & Bellot",
+    url: "https://assets.unilogcorp.com/187/ITEM/DOC/Sellier_Bellot_103221982_Catalog.pdf",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Catalog table lists SB22A Club 40 gr LRN at 1070 fps/G1 0.110, SB22B 40 gr LRN at 1235 fps/G1 0.100, and SB22SUB 40 gr LRN at 1020 fps/G1 0.110."
+  },
+  {
+    id: "cci-standard-velocity-35-page",
+    title: "CCI Standard Velocity 22 LR part 35 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/standard-velocity/6-35.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer product page for CCI Standard Velocity #35."
+  },
+  {
+    id: "cci-sub-sonic-hp-56-page",
+    title: "CCI Sub-Sonic HP 22 LR part 56 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/sub-sonic-hp/6-56.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer product page for CCI Sub-Sonic HP #56."
+  },
+  {
+    id: "cci-mini-mag-30-page",
+    title: "CCI Target Mini-Mag 22 LR part 30 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/target-mini-mag/6-30.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer product page for CCI Target Mini-Mag #30."
+  },
+  {
+    id: "cci-quiet-semi-auto-975-page",
+    title: "CCI Quiet-22 Semi-Auto 22 LR part 975CC product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/quiet-22-semi-auto/6-975CC.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "CCI catalog/product references list Quiet-22 Semi-Auto #975CC as 45 gr RN at 835 fps."
+  },
+  {
+    id: "cci-quiet-22-960-page",
+    title: "CCI Quiet-22 22 LR part 960 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/quiet-22/6-960.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "CCI catalog/product references list Quiet-22 #960 as 40 gr LRN at 710 fps."
+  },
+  {
+    id: "cci-stinger-50-page",
+    title: "CCI Stinger 22 LR part 50 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/stinger/6-50.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "CCI catalog/product references list Stinger #50 as 32 gr CPHP at 1640 fps."
+  },
+  {
+    id: "cci-suppressor-957-page",
+    title: "CCI 22 Suppressor part 957 product page",
+    publisher: "CCI Ammunition",
+    url: "https://www.cci-ammunition.com/rimfire/cci/22-suppressor/6-957.html",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "CCI suppressor-class references list a 45 gr hollow point suppressor load around 970 fps."
+  },
+  {
+    id: "aguila-22-sss-page",
+    title: "Aguila 22 Sniper Subsonic Long Rifle product page / catalog row",
+    publisher: "Aguila Ammunition",
+    url: "https://www.aguilaammo.com/products/22-sniper-subsonic-long-rifle-subsonic-lead-solid-point",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Aguila catalog data lists 60 gr lead solid point, 950 fps muzzle velocity, 848 fps at 100 yd, 120 ft-lb muzzle energy, and recommends 20 inch barrels or longer."
+  },
+  {
+    id: "sb-9mm-list",
+    title: "Sellier & Bellot pistol and revolver cartridges list",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/pistol-and-revolver-ammunition/pistol-and-revolver-cartridges/list/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer list gives 9 mm Luger product numbers and V0 values for FMJ, JHP, SP and subsonic rows."
+  },
+  {
+    id: "sb-9mm-124-fmj-289-pdf",
+    title: "9 mm Luger 124 gr FMJ SB9B datasheet/detail 289",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/pistol-and-revolver-ammunition/pistol-and-revolver-cartridges/detail/289/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Datasheet lists 124 gr FMJ, 1181 fps, G1 BC 0.152, and 6 inch test barrel."
+  },
+  {
+    id: "sb-9mm-115-fmj-290",
+    title: "9 mm Luger 115 gr FMJ V310452 detail 290",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/pistol-and-revolver-ammunition/pistol-and-revolver-cartridges/detail/290/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 115 gr FMJ, V0 390 m/s, G1 BC 0.116, and 150 mm test barrel."
+  },
+  {
+    id: "sb-9mm-jhp-list",
+    title: "Sellier & Bellot 9 mm JHP rows",
+    publisher: "Sellier & Bellot",
+    url: "https://www.sellier-bellot.cz/en/products/pistol-and-revolver-ammunition/pistol-and-revolver-cartridges/list/",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer list includes 115 gr JHP at 377 m/s and 124 gr JHP at 366 m/s."
+  },
+  {
+    id: "geco-9mm-fmjfn-154",
+    title: "GECO 9 mm Luger Full Metal Jacket Flat Nose 10.0 g product datasheet",
+    publisher: "GECO / RWS GmbH",
+    url: "https://geco-ammunition.com/en/ammunition/products-overview/pistol-revolver-cartridges/geco-full-metal-jacket-flat-nose-pr/geco-9-mm-luger-full-metal-jacket-flat-nose-100g",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Product datasheet identifies the 10.0 g / 154 gr FMJ flat-nose load and 150 mm barrel; velocity/BC field availability should be rechecked on future crawls."
+  },
+  {
+    id: "geco-9mm-fmj-124-8g",
+    title: "GECO 9 mm Luger Full Metal Jacket 8.0 g product page",
+    publisher: "GECO / RWS GmbH",
+    url: "https://geco-ammunition.com/en/ammunition/products-overview/pistol-revolver-cartridges/geco-full-metal-jacket-pr/geco-9mm-luger-full-metal-jacket-80g",
+    sourceKind: "manufacturer",
+    retrievedAt: "2026-05-03",
+    notes: "Manufacturer page lists 8.0 g / 124 gr FMJ, 125 mm barrel, G1 BC 0.128, and V0 360 m/s."
+  }
 ];
 
 export function sourceById(id: string): Source | undefined {
