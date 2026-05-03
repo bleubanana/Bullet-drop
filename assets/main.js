@@ -2,7 +2,7 @@ import { calculateAtmosphere } from "./core/atmosphere.js";
 import { calculateTrajectory } from "./core/trajectory.js";
 import { cmToInch, fpsToMs, formatSigned, hPaToInHg, inHgToHPa, inchToCm, kgM3ToLbFt3, mToYard, mphToMs, msToFps, msToMph, roundTo, yardToM } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
-const APP_VERSION = "1.4.5";
+const APP_VERSION = "1.4.6";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300];
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200];
 const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
