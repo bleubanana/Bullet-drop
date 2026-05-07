@@ -20,7 +20,7 @@ import {
 } from "./core/units.js";
 import { AMMUNITION, ammunitionById, ammunitionForCaliber, CALIBERS, caliberById, profileByLoadId, sourceById, SOURCES } from "./data/index.js";
 
-const APP_VERSION = "1.4.11";
+const APP_VERSION = "1.4.12";
 const GA_MEASUREMENT_ID = "G-P1QPSZMLX4";
 const DISTANCE_MARK_VALUES = [25, 50, 100, 150, 200, 300] as const;
 const ZERO_MARK_VALUES = [25, 50, 100, 150, 200] as const;
@@ -62,6 +62,15 @@ const I18N = {
     source: "Källa",
     windDrift: "■ VINDAVDRIFT",
     windHelpPrefix: "Approximation via lag-regel",
+    movingTarget: "Rörligt mål / framförhållning",
+    movingTargetHelp: "Separat framförhållning utifrån kulans flygtid. Påverkar inte drop-tabellen.",
+    targetSpeed: "Målhastighet",
+    targetAngle: "Målvinkel",
+    movingTargetLead: "■ RÖRLIGT MÅL",
+    movingTargetLeadHelp: "Framförhållning = målets sidofart × kulans flygtid.",
+    noLead: "Mot/från",
+    halfLead: "Halv sidokomponent",
+    fullLead: "Full sidokomponent",
     selected: "VALD RAD",
     showSources: "Visa källor",
     dataQuality: "Datakvalitet",
@@ -177,6 +186,15 @@ const I18N = {
     source: "Source",
     windDrift: "■ WIND DRIFT",
     windHelpPrefix: "Lag-rule approximation",
+    movingTarget: "Moving target / lead",
+    movingTargetHelp: "Separate lead estimate from bullet time of flight. Does not change the drop table.",
+    targetSpeed: "Target speed",
+    targetAngle: "Target angle",
+    movingTargetLead: "■ MOVING TARGET",
+    movingTargetLeadHelp: "Lead = target cross speed × bullet time of flight.",
+    noLead: "Toward/away",
+    halfLead: "Half lateral",
+    fullLead: "Full lateral",
     selected: "SELECTED ROW",
     showSources: "Show sources",
     dataQuality: "Data quality",
@@ -278,6 +296,12 @@ const WIND_OPTIONS: Array<{ id: WindOptionId; label: string; factor: number; des
   { id: "full", label: "90°", factor: 1, descKey: "fullWind" }
 ];
 
+const TARGET_OPTIONS: Array<{ id: WindOptionId; label: string; factor: number; descKey: "noLead" | "halfLead" | "fullLead" }> = [
+  { id: "no", label: "0°", factor: 0, descKey: "noLead" },
+  { id: "half", label: "45°", factor: 0.5, descKey: "halfLead" },
+  { id: "full", label: "90°", factor: 1, descKey: "fullLead" }
+];
+
 type State = {
   language: Language;
   unitSystem: UnitSystem;
@@ -293,6 +317,8 @@ type State = {
   windDirectionDeg: number | null;
   latitudeDeg: number | null;
   windOptionId: WindOptionId;
+  targetSpeedMs: number;
+  targetOptionId: WindOptionId;
   twistInPerTurn: number;
   bulletLengthIn: number;
   coriolisEnabled: boolean;
@@ -465,6 +491,8 @@ const state: State = {
   windDirectionDeg: null,
   latitudeDeg: null,
   windOptionId: "full",
+  targetSpeedMs: Math.max(0, readNumber("targetSpeedMs", 0)),
+  targetOptionId: safeGetStorage("targetOptionId") === "no" || safeGetStorage("targetOptionId") === "half" || safeGetStorage("targetOptionId") === "full" ? safeGetStorage("targetOptionId") as WindOptionId : "full",
   twistInPerTurn: normalizedTwistIn("22lr", readNumber("twistIn:22lr", defaultTwistIn("22lr"))),
   bulletLengthIn: estimatedBulletLengthIn(ammunitionById("cci-standard-velocity-35")),
   coriolisEnabled: safeGetStorage("coriolisEnabled") === "true",
@@ -520,6 +548,8 @@ function setState(patch: Partial<State>): void {
   safeSetStorage(`twistIn:${state.caliberId}`, String(state.twistInPerTurn));
   safeSetStorage("coriolisEnabled", String(state.coriolisEnabled));
   safeSetStorage("firingDirectionDeg", String(state.firingDirectionDeg));
+  safeSetStorage("targetSpeedMs", String(state.targetSpeedMs));
+  safeSetStorage("targetOptionId", state.targetOptionId);
   safeSetStorage("analyticsConsent", state.analyticsConsent);
   applyPreferences();
   render();
@@ -734,6 +764,26 @@ function formatWindCell(point: TrajectoryPoint): { primary: string; secondary: s
   return { primary: linear, secondary: angular };
 }
 
+
+function activeTargetOption(): typeof TARGET_OPTIONS[number] {
+  return TARGET_OPTIONS.find(option => option.id === state.targetOptionId) ?? TARGET_OPTIONS[TARGET_OPTIONS.length - 1]!;
+}
+
+function formatLeadCell(leadCm: number, distanceM: number): { primary: string; secondary: string } {
+  const mrad = distanceM > 0 ? (leadCm / 100 / distanceM) * 1000 : 0;
+  const moa = mrad * 3.43774677;
+  if (Math.abs(leadCm) < 0.05) {
+    return { primary: "±0", secondary: state.unitSystem === "imperial" ? "0.00 moa" : "0.00 mrad" };
+  }
+  if (state.unitSystem === "imperial") {
+    return { primary: `${roundTo(cmToInch(leadCm), 2).toFixed(2)} in`, secondary: `${roundTo(moa, 2).toFixed(2)} moa` };
+  }
+  if (Math.abs(leadCm) >= 100) {
+    return { primary: `${roundTo(leadCm / 100, 2).toFixed(2)} m`, secondary: `${roundTo(mrad, 2).toFixed(2)} mrad` };
+  }
+  return { primary: `${roundTo(leadCm, 1).toFixed(1)} cm`, secondary: `${roundTo(mrad, 2).toFixed(2)} mrad` };
+}
+
 function unitAwareDropLegend(): string[] {
   if (state.unitSystem === "imperial") return ["±0–2 in", "2–10 in", "10–30 in", ">30 in"];
   return ["±0–5 cm", "5–25 cm", "25–75 cm", ">75 cm"];
@@ -906,6 +956,15 @@ function renderWindButtons(): string {
   `).join("");
 }
 
+
+function renderTargetButtons(): string {
+  return TARGET_OPTIONS.map(option => `
+    <button class="chip ${option.id === state.targetOptionId ? "active" : ""}" data-target-option="${option.id}">
+      ${option.label}<small>${escapeHtml(t(option.descKey))}</small>
+    </button>
+  `).join("");
+}
+
 function renderDropTable(caliberColor: string, calculations: BarrelCalculation[]): string {
   const marks = distanceMarks();
   const legend = unitAwareDropLegend();
@@ -994,6 +1053,69 @@ function renderWindTable(calculations: BarrelCalculation[]): string {
   `;
 }
 
+
+
+function renderMovingTargetControls(): string {
+  const targetInputValue = state.unitSystem === "imperial" ? roundTo(msToMph(state.targetSpeedMs), 1).toString() : roundTo(state.targetSpeedMs, 1).toString();
+  const targetUnit = state.unitSystem === "imperial" ? "mph" : "m/s";
+  return `
+    <section class="panel advanced-panel moving-target-panel">
+      <div class="panel-head compact">
+        <div>
+          <h2>${t("movingTarget")}</h2>
+          <p>${t("movingTargetHelp")}</p>
+        </div>
+      </div>
+      <div class="advanced-controls">
+        ${renderNumberControl(t("targetSpeed"), "targetSpeedInput", targetInputValue, 0, state.unitSystem === "imperial" ? 45 : 20, state.unitSystem === "imperial" ? 0.5 : 0.1, targetUnit)}
+        <label class="control target-angle-control">
+          <span>${t("targetAngle")}</span>
+          <div class="chip-row">${renderTargetButtons()}</div>
+        </label>
+      </div>
+    </section>
+  `;
+}
+
+function renderMovingTargetTable(calculations: BarrelCalculation[]): string {
+  const targetOption = activeTargetOption();
+  if (state.targetSpeedMs <= 0 || targetOption.factor <= 0) return "";
+  const marks = distanceMarks();
+  return `
+    <section class="panel table-panel moving-results-panel">
+      <div class="panel-head compact">
+        <div>
+          <h2>${t("movingTargetLead")}</h2>
+          <p>${t("movingTargetLeadHelp")} ${formatWindSpeed(state.targetSpeedMs)} · ${targetOption.label} · ${escapeHtml(t(targetOption.descKey))}.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>${t("barrel")}</th>
+              <th>MV</th>
+              ${marks.map(mark => `<th>${mark.label}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${calculations.map(calc => `
+              <tr>
+                <td class="barrel">${formatBarrelLengthHtml(calc.barrel.barrelLengthIn)}</td>
+                <td>${formatVelocityTextFromFps(calc.barrel.velocityFps)}</td>
+                ${calc.points.map(point => {
+                  const leadCm = state.targetSpeedMs * targetOption.factor * point.timeOfFlightS * 100;
+                  const display = formatLeadCell(leadCm, point.distanceM);
+                  return `<td><strong class="wind-blue">${display.primary}</strong><small>${display.secondary}</small></td>`;
+                }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
 
 function renderStabilityPanel(load: AmmunitionLoad, calculations: BarrelCalculation[]): string {
   const firstBarrel = calculations[0]?.barrel;
@@ -1335,12 +1457,14 @@ function render(): void {
         <div class="stack">
           ${renderDropTable(caliber.color, calculations)}
           ${renderWindTable(calculations)}
+          ${renderMovingTargetTable(calculations)}
           ${renderCoriolisTable(calculations)}
           ${renderMuzzleVelocityPanel(load)}
           ${renderCribCard(load, calculations, caliber.color)}
         </div>
         <div id="audit" class="stack side-stack">
           ${renderDataAudit(load)}
+          ${renderMovingTargetControls()}
           ${renderStabilityPanel(load, calculations)}
           ${renderCoriolisControls()}
           <section class="panel notes-panel">
@@ -1405,6 +1529,10 @@ function bindEvents(): void {
     button.addEventListener("click", () => setState({ windOptionId: (button.dataset.windOption as WindOptionId | undefined) ?? state.windOptionId }));
   });
 
+  document.querySelectorAll<HTMLButtonElement>("[data-target-option]").forEach(button => {
+    button.addEventListener("click", () => setState({ targetOptionId: (button.dataset.targetOption as WindOptionId | undefined) ?? state.targetOptionId }));
+  });
+
   const loadSelect = document.getElementById("loadSelect") as HTMLSelectElement | null;
   loadSelect?.addEventListener("change", () => setState({ loadId: loadSelect.value }));
 
@@ -1430,6 +1558,12 @@ function bindEvents(): void {
   windInput?.addEventListener("change", () => {
     const value = Number(windInput.value);
     setState({ windSpeedMs: state.unitSystem === "imperial" ? mphToMs(value) : value, weatherStatus: "idle", weatherMessage: null, windDirectionDeg: null });
+  });
+
+  const targetSpeedInput = document.getElementById("targetSpeedInput") as HTMLInputElement | null;
+  targetSpeedInput?.addEventListener("change", () => {
+    const value = Number(targetSpeedInput.value);
+    if (Number.isFinite(value)) setState({ targetSpeedMs: Math.max(0, state.unitSystem === "imperial" ? mphToMs(value) : value) });
   });
 
   const twistInput = document.getElementById("twistInput") as HTMLInputElement | null;
